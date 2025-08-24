@@ -42,3 +42,9 @@ next-env.d.ts
 # Database files
 prisma/dev.db
 *.db
+
+# Local database files
+prisma/dev.db
+prisma/dev.db-journal
+*.db
+*.db-journal
