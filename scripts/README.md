@@ -46,9 +46,15 @@ brew install postgresql
 
 ### **3. Configure Environment Variables**
 
-Create `.env` file with:
+The Go script automatically reads from your project's `.env` or `.env.local` file in the root directory!
+
+Your existing `.env` file should have:
 ```env
-DATABASE_URL="your-neon-database-url"
+DATABASE_URL="postgresql://neondb_owner:npg_IZb9Q6DjfGhg@ep-orange-dust-adaq832q-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require"
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-secret"
+
+# Add these for cloud storage (optional):
 CLOUD_PROVIDER="aws"  # or "gcp" or "azure"
 BACKUP_BUCKET="your-backup-bucket-name"
 CLOUD_REGION="us-east-1"

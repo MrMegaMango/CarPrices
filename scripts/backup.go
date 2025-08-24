@@ -2,7 +2,6 @@ package main
 
 import (
 	"archive/zip"
-	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -11,18 +10,18 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
 type BackupConfig struct {
-	DatabaseURL    string
-	BackupDir      string
-	RetentionDays  int
-	CloudStorage   CloudConfig
+	DatabaseURL   string
+	BackupDir     string
+	RetentionDays int
+	CloudStorage  CloudConfig
 }
 
 type CloudConfig struct {
@@ -32,22 +31,36 @@ type CloudConfig struct {
 }
 
 type BackupMetadata struct {
-	Timestamp     time.Time `json:"timestamp"`
-	DatabaseName  string    `json:"database_name"`
-	BackupType    string    `json:"backup_type"`
-	FileSize      int64     `json:"file_size"`
+	Timestamp     time.Time      `json:"timestamp"`
+	DatabaseName  string         `json:"database_name"`
+	BackupType    string         `json:"backup_type"`
+	FileSize      int64          `json:"file_size"`
 	RecordCounts  map[string]int `json:"record_counts"`
-	SchemaVersion string    `json:"schema_version"`
-	Checksum      string    `json:"checksum"`
+	SchemaVersion string         `json:"schema_version"`
+	Checksum      string         `json:"checksum"`
 }
 
 func main() {
+	// Load .env file from parent directory (project root)
+	envPath := filepath.Join("..", ".env")
+	if err := godotenv.Load(envPath); err != nil {
+		// If .env doesn't exist, try .env.local
+		envLocalPath := filepath.Join("..", ".env.local")
+		if err := godotenv.Load(envLocalPath); err != nil {
+			fmt.Printf("⚠️ No .env file found, using system environment variables only\n")
+		} else {
+			fmt.Printf("📄 Loaded environment from %s\n", envLocalPath)
+		}
+	} else {
+		fmt.Printf("📄 Loaded environment from %s\n", envPath)
+	}
+
 	config := BackupConfig{
 		DatabaseURL:   os.Getenv("DATABASE_URL"),
 		BackupDir:     "./backups",
 		RetentionDays: 30 * 365, // 30 years in days
 		CloudStorage: CloudConfig{
-			Provider:   os.Getenv("CLOUD_PROVIDER"),   // aws, gcp, azure
+			Provider:   os.Getenv("CLOUD_PROVIDER"), // aws, gcp, azure
 			BucketName: os.Getenv("BACKUP_BUCKET"),
 			Region:     os.Getenv("CLOUD_REGION"),
 		},
@@ -105,43 +118,43 @@ func ensureBackupDir(dir string) error {
 
 func createSQLBackup(config BackupConfig, backupID string) (string, error) {
 	sqlFile := filepath.Join(config.BackupDir, fmt.Sprintf("cardeals-sql-%s.sql", backupID))
-	
+
 	fmt.Printf("📊 Creating SQL backup: %s\n", sqlFile)
-	
+
 	cmd := exec.Command("pg_dump", config.DatabaseURL)
-	
+
 	outFile, err := os.Create(sqlFile)
 	if err != nil {
 		return "", fmt.Errorf("failed to create SQL backup file: %w", err)
 	}
 	defer outFile.Close()
-	
+
 	cmd.Stdout = outFile
 	cmd.Stderr = os.Stderr
-	
+
 	if err := cmd.Run(); err != nil {
 		return "", fmt.Errorf("pg_dump failed: %w", err)
 	}
-	
+
 	// Verify backup file
 	if stat, err := os.Stat(sqlFile); err != nil || stat.Size() == 0 {
 		return "", fmt.Errorf("SQL backup file is empty or doesn't exist")
 	}
-	
+
 	return sqlFile, nil
 }
 
 func createJSONBackup(config BackupConfig, backupID string) (string, error) {
 	jsonFile := filepath.Join(config.BackupDir, fmt.Sprintf("cardeals-json-%s.json", backupID))
-	
+
 	fmt.Printf("📄 Creating JSON backup: %s\n", jsonFile)
-	
+
 	db, err := sql.Open("postgres", config.DatabaseURL)
 	if err != nil {
 		return "", fmt.Errorf("failed to connect to database: %w", err)
 	}
 	defer db.Close()
-	
+
 	// Export data from all tables
 	exportData := make(map[string]interface{})
 	metadata := BackupMetadata{
@@ -149,9 +162,9 @@ func createJSONBackup(config BackupConfig, backupID string) (string, error) {
 		BackupType:   "JSON",
 		RecordCounts: make(map[string]int),
 	}
-	
+
 	tables := []string{"CarMake", "CarModel", "CarDeal", "User", "Account", "Session"}
-	
+
 	for _, table := range tables {
 		data, count, err := exportTable(db, table)
 		if err != nil {
@@ -161,75 +174,75 @@ func createJSONBackup(config BackupConfig, backupID string) (string, error) {
 		exportData[table] = data
 		metadata.RecordCounts[table] = count
 	}
-	
+
 	// Add metadata
 	exportData["_metadata"] = metadata
-	
+
 	// Write JSON file
 	file, err := os.Create(jsonFile)
 	if err != nil {
 		return "", fmt.Errorf("failed to create JSON backup file: %w", err)
 	}
 	defer file.Close()
-	
+
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
-	
+
 	if err := encoder.Encode(exportData); err != nil {
 		return "", fmt.Errorf("failed to encode JSON: %w", err)
 	}
-	
+
 	return jsonFile, nil
 }
 
 func exportTable(db *sql.DB, tableName string) ([]map[string]interface{}, int, error) {
 	query := fmt.Sprintf(`SELECT to_jsonb(t) FROM "%s" t`, tableName)
-	
+
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, 0, err
 	}
 	defer rows.Close()
-	
+
 	var records []map[string]interface{}
-	
+
 	for rows.Next() {
 		var jsonData string
 		if err := rows.Scan(&jsonData); err != nil {
 			continue
 		}
-		
+
 		var record map[string]interface{}
 		if err := json.Unmarshal([]byte(jsonData), &record); err != nil {
 			continue
 		}
-		
+
 		records = append(records, record)
 	}
-	
+
 	return records, len(records), nil
 }
 
 func createArchive(baseDir, backupID string, files []string) (string, error) {
 	archivePath := filepath.Join(baseDir, fmt.Sprintf("cardeals-backup-%s.zip", backupID))
-	
+
 	fmt.Printf("📦 Creating archive: %s\n", archivePath)
-	
+
 	archive, err := os.Create(archivePath)
 	if err != nil {
 		return "", err
 	}
 	defer archive.Close()
-	
+
 	zipWriter := zip.NewWriter(archive)
 	defer zipWriter.Close()
-	
+
 	for _, filePath := range files {
 		if err := addFileToZip(zipWriter, filePath); err != nil {
 			return "", err
 		}
 	}
-	
+
 	return archivePath, nil
 }
 
@@ -239,25 +252,25 @@ func addFileToZip(zipWriter *zip.Writer, filename string) error {
 		return err
 	}
 	defer file.Close()
-	
+
 	info, err := file.Stat()
 	if err != nil {
 		return err
 	}
-	
+
 	header, err := zip.FileInfoHeader(info)
 	if err != nil {
 		return err
 	}
-	
+
 	header.Name = filepath.Base(filename)
 	header.Method = zip.Deflate
-	
+
 	writer, err := zipWriter.CreateHeader(header)
 	if err != nil {
 		return err
 	}
-	
+
 	_, err = io.Copy(writer, file)
 	return err
 }
@@ -279,7 +292,7 @@ func uploadToAWS(config BackupConfig, filePath string) error {
 	// AWS S3 upload using AWS CLI
 	filename := filepath.Base(filePath)
 	s3Path := fmt.Sprintf("s3://%s/cardeals-backups/%s", config.CloudStorage.BucketName, filename)
-	
+
 	cmd := exec.Command("aws", "s3", "cp", filePath, s3Path, "--region", config.CloudStorage.Region)
 	return cmd.Run()
 }
@@ -288,7 +301,7 @@ func uploadToGCP(config BackupConfig, filePath string) error {
 	// Google Cloud Storage upload using gsutil
 	filename := filepath.Base(filePath)
 	gcsPath := fmt.Sprintf("gs://%s/cardeals-backups/%s", config.CloudStorage.BucketName, filename)
-	
+
 	cmd := exec.Command("gsutil", "cp", filePath, gcsPath)
 	return cmd.Run()
 }
@@ -296,7 +309,7 @@ func uploadToGCP(config BackupConfig, filePath string) error {
 func uploadToAzure(config BackupConfig, filePath string) error {
 	// Azure Blob Storage upload using az CLI
 	filename := filepath.Base(filePath)
-	
+
 	cmd := exec.Command("az", "storage", "blob", "upload",
 		"--file", filePath,
 		"--name", fmt.Sprintf("cardeals-backups/%s", filename),
@@ -306,19 +319,19 @@ func uploadToAzure(config BackupConfig, filePath string) error {
 
 func cleanupOldBackups(config BackupConfig) {
 	fmt.Printf("🧹 Cleaning up backups older than %d days\n", config.RetentionDays)
-	
+
 	cutoffTime := time.Now().AddDate(0, 0, -config.RetentionDays)
-	
+
 	filepath.Walk(config.BackupDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return nil
 		}
-		
+
 		if strings.Contains(info.Name(), "cardeals-backup-") && info.ModTime().Before(cutoffTime) {
 			fmt.Printf("🗑️ Deleting old backup: %s\n", info.Name())
 			os.Remove(path)
 		}
-		
+
 		return nil
 	})
 }
