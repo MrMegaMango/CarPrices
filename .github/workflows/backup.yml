@@ -27,8 +27,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y postgresql-client-17
           
-      - name: Verify PostgreSQL version
-        run: pg_dump --version
+      - name: Verify PostgreSQL version and set path
+        run: |
+          # Check available PostgreSQL versions
+          ls -la /usr/lib/postgresql/
+          
+          # Update PATH to use PostgreSQL 17 binaries first
+          echo "/usr/lib/postgresql/17/bin" >> $GITHUB_PATH
+          
+          # Verify the correct version is now being used
+          /usr/lib/postgresql/17/bin/pg_dump --version
           
       - name: Install Go dependencies
         working-directory: ./scripts
@@ -62,7 +70,14 @@ jobs:
           CLOUD_PROVIDER: ${{ secrets.CLOUD_PROVIDER }}
           BACKUP_BUCKET: ${{ secrets.BACKUP_BUCKET }}
           CLOUD_REGION: ${{ secrets.CLOUD_REGION }}
-        run: go run backup.go
+          PATH: /usr/lib/postgresql/17/bin:${{ env.PATH }}
+        run: |
+          # Verify we're using the correct pg_dump
+          which pg_dump
+          pg_dump --version
+          
+          # Run the backup
+          go run backup.go
         
       - name: Upload to GitHub artifacts (short-term)
         uses: actions/upload-artifact@v4
