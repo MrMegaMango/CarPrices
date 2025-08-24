@@ -83,7 +83,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: database-backup-${{ github.run_number }}
-          path: backups/
+          path: scripts/backups/
           retention-days: 90
           
       - name: Notify backup completion
