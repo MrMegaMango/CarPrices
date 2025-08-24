@@ -80,19 +80,10 @@ export function Navigation() {
             </div>
           ) : (
             <div className="flex items-center space-x-2">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => signIn()}
-                disabled={process.env.NODE_ENV === 'production' && !process.env.GOOGLE_CLIENT_ID}
-              >
+              <Button variant="ghost" size="sm" onClick={() => signIn()}>
                 Sign In
               </Button>
-              <Button 
-                size="sm" 
-                onClick={() => signIn()}
-                disabled={process.env.NODE_ENV === 'production' && !process.env.GOOGLE_CLIENT_ID}
-              >
+              <Button size="sm" onClick={() => signIn()}>
                 Get Started
               </Button>
             </div>
