@@ -163,7 +163,13 @@ func createJSONBackup(config BackupConfig, backupID string) (string, error) {
 		RecordCounts: make(map[string]int),
 	}
 
-	tables := []string{"CarMake", "CarModel", "CarDeal", "User", "Account", "Session"}
+	// Get all table names from the database
+	tables, err := getTableNames(db)
+	if err != nil {
+		return "", fmt.Errorf("failed to get table names: %w", err)
+	}
+
+	fmt.Printf("📋 Found %d tables to backup\n", len(tables))
 
 	for _, table := range tables {
 		data, count, err := exportTable(db, table)
@@ -173,6 +179,7 @@ func createJSONBackup(config BackupConfig, backupID string) (string, error) {
 		}
 		exportData[table] = data
 		metadata.RecordCounts[table] = count
+		fmt.Printf("✅ Exported %s: %d records\n", table, count)
 	}
 
 	// Add metadata
@@ -193,6 +200,33 @@ func createJSONBackup(config BackupConfig, backupID string) (string, error) {
 	}
 
 	return jsonFile, nil
+}
+
+func getTableNames(db *sql.DB) ([]string, error) {
+	query := `
+		SELECT table_name 
+		FROM information_schema.tables 
+		WHERE table_schema = 'public' 
+		AND table_type = 'BASE TABLE'
+		ORDER BY table_name
+	`
+	
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	
+	var tables []string
+	for rows.Next() {
+		var tableName string
+		if err := rows.Scan(&tableName); err != nil {
+			continue
+		}
+		tables = append(tables, tableName)
+	}
+	
+	return tables, nil
 }
 
 func exportTable(db *sql.DB, tableName string) ([]map[string]interface{}, int, error) {
