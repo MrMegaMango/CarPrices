@@ -67,6 +67,7 @@ export default function NewDealPage() {
   const [filteredModels, setFilteredModels] = useState<CarModel[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isClient, setIsClient] = useState(false)
+  const [isLoadingData, setIsLoadingData] = useState(true)
 
   const form = useForm<DealFormData>({
     resolver: zodResolver(dealFormSchema),
@@ -82,26 +83,43 @@ export default function NewDealPage() {
   const fetchMakes = async () => {
     try {
       const response = await fetch('/api/makes')
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
       const data = await response.json()
-      setMakes(data)
+      // Ensure data is an array before setting state
+      setMakes(Array.isArray(data) ? data : [])
     } catch (error) {
       console.error('Error fetching makes:', error)
+      setMakes([]) // Ensure makes is always an array
+      toast.error('Failed to load car makes')
     }
   }
 
   const fetchModels = async () => {
     try {
       const response = await fetch('/api/models')
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
       const data = await response.json()
-      setModels(data)
+      // Ensure data is an array before setting state
+      setModels(Array.isArray(data) ? data : [])
     } catch (error) {
       console.error('Error fetching models:', error)
+      setModels([]) // Ensure models is always an array
+      toast.error('Failed to load car models')
     }
   }
 
+  const fetchData = async () => {
+    setIsLoadingData(true)
+    await Promise.all([fetchMakes(), fetchModels()])
+    setIsLoadingData(false)
+  }
+
   useEffect(() => {
-    fetchMakes()
-    fetchModels()
+    fetchData()
   }, [])
 
   useEffect(() => {
@@ -122,13 +140,14 @@ export default function NewDealPage() {
     setIsClient(true)
   }, [])
 
-  if (status === 'loading' || !isClient) {
+  if (status === 'loading' || !isClient || isLoadingData) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center h-64">
             <Loader2 className="h-8 w-8 animate-spin" />
+            <span className="ml-2">Loading car data...</span>
           </div>
         </div>
       </div>
@@ -210,7 +229,7 @@ export default function NewDealPage() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {makes.map((make) => (
+                            {Array.isArray(makes) && makes.map((make) => (
                               <SelectItem key={make.id} value={make.id}>
                                 {make.name}
                               </SelectItem>
@@ -235,7 +254,7 @@ export default function NewDealPage() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {filteredModels.map((model) => (
+                            {Array.isArray(filteredModels) && filteredModels.map((model) => (
                               <SelectItem key={model.id} value={model.id}>
                                 {model.name}
                               </SelectItem>
