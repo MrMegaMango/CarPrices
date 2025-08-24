@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useForm } from 'react-hook-form'
@@ -65,6 +66,7 @@ export default function NewDealPage() {
   const [models, setModels] = useState<CarModel[]>([])
   const [filteredModels, setFilteredModels] = useState<CarModel[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isClient, setIsClient] = useState(false)
 
   const form = useForm<DealFormData>({
     resolver: zodResolver(dealFormSchema),
@@ -95,7 +97,12 @@ export default function NewDealPage() {
     }
   }, [selectedMakeId, models, form])
 
-  if (status === 'loading') {
+  // Handle hydration
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  if (status === 'loading' || !isClient) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />
