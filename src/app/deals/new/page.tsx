@@ -79,6 +79,26 @@ export default function NewDealPage() {
   const selectedMakeId = form.watch('makeId')
   const isLeased = form.watch('isLeased')
 
+  const fetchMakes = async () => {
+    try {
+      const response = await fetch('/api/makes')
+      const data = await response.json()
+      setMakes(data)
+    } catch (error) {
+      console.error('Error fetching makes:', error)
+    }
+  }
+
+  const fetchModels = async () => {
+    try {
+      const response = await fetch('/api/models')
+      const data = await response.json()
+      setModels(data)
+    } catch (error) {
+      console.error('Error fetching models:', error)
+    }
+  }
+
   useEffect(() => {
     fetchMakes()
     fetchModels()
@@ -118,26 +138,6 @@ export default function NewDealPage() {
   if (!session) {
     router.push('/api/auth/signin')
     return null
-  }
-
-  const fetchMakes = async () => {
-    try {
-      const response = await fetch('/api/makes')
-      const data = await response.json()
-      setMakes(data)
-    } catch (error) {
-      console.error('Error fetching makes:', error)
-    }
-  }
-
-  const fetchModels = async () => {
-    try {
-      const response = await fetch('/api/models')
-      const data = await response.json()
-      setModels(data)
-    } catch (error) {
-      console.error('Error fetching models:', error)
-    }
   }
 
   const onSubmit = async (data: DealFormData) => {
