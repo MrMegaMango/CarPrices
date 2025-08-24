@@ -12,7 +12,9 @@
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "db:migrate": "prisma migrate dev",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "db:backup": "node scripts/backup-database.js",
+    "backup:manual": "node scripts/backup-database.js"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

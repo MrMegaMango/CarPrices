@@ -65,6 +65,11 @@ export function Navigation() {
                   <DropdownMenuItem asChild>
                     <Link href="/my-deals">My Deals</Link>
                   </DropdownMenuItem>
+                  {session.user?.email === 'amangocoding@gmail.com' && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/admin/backup">Admin Backup</Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => signOut()}>
                     <LogOut className="h-4 w-4 mr-2" />
