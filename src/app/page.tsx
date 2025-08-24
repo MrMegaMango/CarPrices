@@ -1,103 +1,158 @@
-import Image from "next/image";
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Navigation } from '@/components/navigation'
+import { Car, TrendingDown, Users, Shield, BarChart3, Search } from 'lucide-react'
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <Navigation />
+      
+      {/* Hero Section */}
+      <section className="container mx-auto px-4 py-16 text-center">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-5xl font-bold text-gray-900 mb-6">
+            Real Car Deal Prices from
+            <span className="text-blue-600"> Real Buyers</span>
+          </h1>
+          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            Discover what people actually paid for their cars. Compare MSRP, selling prices, 
+            and out-the-door costs to get the best deal on your next vehicle.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild size="lg" className="text-lg px-8">
+              <Link href="/deals">Browse Deals</Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="text-lg px-8">
+              <Link href="/deals/new">Share Your Deal</Link>
+            </Button>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      </section>
+
+      {/* Features Section */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            How CarDeals Works
+          </h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Get insights from real car buyers to make informed purchasing decisions
+          </p>
+        </div>
+        
+        <div className="grid md:grid-cols-3 gap-8">
+          <Card className="text-center">
+            <CardHeader>
+              <div className="mx-auto w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <Search className="h-6 w-6 text-blue-600" />
+              </div>
+              <CardTitle>Search & Filter</CardTitle>
+              <CardDescription>
+                Find deals by make, model, year, price range, and location
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card className="text-center">
+            <CardHeader>
+              <div className="mx-auto w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                <TrendingDown className="h-6 w-6 text-green-600" />
+              </div>
+              <CardTitle>Compare Prices</CardTitle>
+              <CardDescription>
+                See MSRP vs actual selling prices and identify the best savings
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card className="text-center">
+            <CardHeader>
+              <div className="mx-auto w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                <Users className="h-6 w-6 text-purple-600" />
+              </div>
+              <CardTitle>Share Your Deal</CardTitle>
+              <CardDescription>
+                Help others by sharing your car buying experience and pricing
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="bg-white py-16">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Trusted by Car Buyers
+            </h2>
+          </div>
+          
+          <div className="grid md:grid-cols-4 gap-8 text-center">
+            <div>
+              <div className="text-3xl font-bold text-blue-600 mb-2">10,000+</div>
+              <div className="text-gray-600">Car Deals Shared</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-green-600 mb-2">$2.5M+</div>
+              <div className="text-gray-600">Total Savings Tracked</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-purple-600 mb-2">150+</div>
+              <div className="text-gray-600">Car Makes & Models</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-orange-600 mb-2">50</div>
+              <div className="text-gray-600">States Covered</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="container mx-auto px-4 py-16">
+        <Card className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+          <CardContent className="text-center py-12">
+            <h2 className="text-3xl font-bold mb-4">
+              Ready to Find Your Best Car Deal?
+            </h2>
+            <p className="text-blue-100 mb-8 max-w-2xl mx-auto">
+              Join thousands of smart car buyers who use CarDeals to research 
+              and share real pricing information.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button asChild size="lg" variant="secondary">
+                <Link href="/deals">Start Browsing</Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-blue-600">
+                <Link href="/statistics">View Statistics</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="flex items-center space-x-2 mb-4 md:mb-0">
+              <Car className="h-6 w-6 text-blue-400" />
+              <span className="font-bold text-xl">CarDeals</span>
+            </div>
+            <div className="flex space-x-6 text-sm text-gray-400">
+              <Link href="/privacy" className="hover:text-white">Privacy</Link>
+              <Link href="/terms" className="hover:text-white">Terms</Link>
+              <Link href="/contact" className="hover:text-white">Contact</Link>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
+            © 2024 CarDeals. Made with ❤️ for car buyers.
+          </div>
+        </div>
       </footer>
     </div>
-  );
+  )
 }
