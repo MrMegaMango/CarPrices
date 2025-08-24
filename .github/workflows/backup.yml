@@ -70,10 +70,10 @@ jobs:
           CLOUD_PROVIDER: ${{ secrets.CLOUD_PROVIDER }}
           BACKUP_BUCKET: ${{ secrets.BACKUP_BUCKET }}
           CLOUD_REGION: ${{ secrets.CLOUD_REGION }}
-          PATH: /usr/lib/postgresql/17/bin:${{ env.PATH }}
         run: |
-          # Verify we're using the correct pg_dump
-          which pg_dump
+          # Set PATH to use PostgreSQL 17 and verify
+          export PATH="/usr/lib/postgresql/17/bin:$PATH"
+          echo "Using pg_dump at: $(which pg_dump)"
           pg_dump --version
           
           # Run the backup
