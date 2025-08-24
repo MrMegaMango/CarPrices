@@ -165,8 +165,15 @@ export default function ContactPage() {
                 <div className="flex items-start space-x-3">
                   <Mail className="h-5 w-5 text-gray-400 mt-0.5" />
                   <div>
-                    <p className="font-medium">Email</p>
-                    <p className="text-sm text-gray-600">support@cardeals.com</p>
+                    <p className="font-medium">Portfolio & Contact</p>
+                    <a 
+                      href="https://zuo.vercel.app" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 hover:underline"
+                    >
+                      zuo.vercel.app
+                    </a>
                   </div>
                 </div>
                 
