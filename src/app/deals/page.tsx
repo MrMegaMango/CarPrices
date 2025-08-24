@@ -36,20 +36,28 @@ export default function DealsPage() {
   const fetchMakes = async () => {
     try {
       const response = await fetch('/api/makes')
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
       const data = await response.json()
-      setMakes(data)
+      setMakes(Array.isArray(data) ? data : [])
     } catch (error) {
       console.error('Error fetching makes:', error)
+      setMakes([])
     }
   }
 
   const fetchModels = async () => {
     try {
       const response = await fetch('/api/models')
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
       const data = await response.json()
-      setModels(data)
+      setModels(Array.isArray(data) ? data : [])
     } catch (error) {
       console.error('Error fetching models:', error)
+      setModels([])
     }
   }
 

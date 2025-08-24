@@ -87,6 +87,7 @@ export default function NewDealPage() {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
       const data = await response.json()
+      console.log('Fetched makes data:', data) // Debug log
       // Ensure data is an array before setting state
       setMakes(Array.isArray(data) ? data : [])
     } catch (error) {
@@ -222,18 +223,24 @@ export default function NewDealPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Make</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select make" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {Array.isArray(makes) && makes.map((make) => (
-                              <SelectItem key={make.id} value={make.id}>
-                                {make.name}
+                            {Array.isArray(makes) && makes.length > 0 ? (
+                              makes.map((make) => (
+                                <SelectItem key={make.id} value={make.id}>
+                                  {make.name}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <SelectItem value="" disabled>
+                                {makes.length === 0 ? 'Loading makes...' : 'No makes available'}
                               </SelectItem>
-                            ))}
+                            )}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -247,14 +254,14 @@ export default function NewDealPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Model</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!selectedMakeId}>
+                        <Select onValueChange={field.onChange} value={field.value} disabled={!selectedMakeId}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select model" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {Array.isArray(filteredModels) && filteredModels.map((model) => (
+                            {Array.isArray(filteredModels) && filteredModels.length > 0 && filteredModels.map((model) => (
                               <SelectItem key={model.id} value={model.id}>
                                 {model.name}
                               </SelectItem>
