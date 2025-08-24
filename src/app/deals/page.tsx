@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Navigation } from '@/components/navigation'
 import { DealFilters } from '@/components/deal-filters'
 import { DealCard } from '@/components/deal-card'
@@ -37,13 +37,13 @@ export default function DealsPage() {
     fetchMakes()
     fetchModels()
     fetchDeals()
-  }, [])
+  }, [fetchDeals])
 
   useEffect(() => {
     if (Object.keys(filters).length > 0) {
       fetchDeals(true)
     }
-  }, [filters])
+  }, [filters, fetchDeals])
 
   const fetchMakes = async () => {
     try {
@@ -65,7 +65,7 @@ export default function DealsPage() {
     }
   }
 
-  const fetchDeals = async (reset = false) => {
+  const fetchDeals = useCallback(async (reset = false) => {
     try {
       if (reset) {
         setLoading(true)
@@ -96,7 +96,7 @@ export default function DealsPage() {
       setLoading(false)
       setLoadingMore(false)
     }
-  }
+  }, [pagination.page, pagination.limit, filters])
 
   const loadMore = () => {
     if (pagination.page < pagination.pages) {
@@ -105,7 +105,7 @@ export default function DealsPage() {
     }
   }
 
-  const handleFiltersChange = (newFilters: any) => {
+  const handleFiltersChange = (newFilters: Record<string, string>) => {
     setFilters(newFilters)
   }
 

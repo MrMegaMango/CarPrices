@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,7 +19,7 @@ import { CarMake, CarModel } from '@prisma/client'
 interface DealFiltersProps {
   makes: CarMake[]
   models: CarModel[]
-  onFiltersChange?: (filters: any) => void
+  onFiltersChange?: (filters: Record<string, string>) => void
 }
 
 export function DealFilters({ makes, models, onFiltersChange }: DealFiltersProps) {

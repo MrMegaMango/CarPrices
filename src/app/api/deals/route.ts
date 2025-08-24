@@ -42,7 +42,16 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '20')
 
-    const where: any = {
+    const where: {
+      isPublic: boolean
+      makeId?: string
+      modelId?: string
+      year?: number
+      sellingPrice?: {
+        gte?: number
+        lte?: number
+      }
+    } = {
       isPublic: true,
     }
 
@@ -55,7 +64,7 @@ export async function GET(request: NextRequest) {
       if (maxPrice) where.sellingPrice.lte = parseInt(maxPrice) * 100 // Convert to cents
     }
 
-    let orderBy: any = {}
+    let orderBy: Record<string, string> = {}
     switch (sortBy) {
       case 'price':
         orderBy = { sellingPrice: sortOrder }
@@ -155,7 +164,7 @@ export async function POST(request: NextRequest) {
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
+        { error: 'Validation failed', details: error.issues },
         { status: 400 }
       )
     }

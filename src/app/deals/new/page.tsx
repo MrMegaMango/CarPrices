@@ -8,9 +8,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Navigation } from '@/components/navigation'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -30,7 +29,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { toast } from 'sonner'
-import { Loader2, Car, DollarSign, Calendar, MapPin } from 'lucide-react'
+import { Loader2, Car, DollarSign, Calendar } from 'lucide-react'
 import { CarMake, CarModel } from '@prisma/client'
 
 const dealFormSchema = z.object({
@@ -151,7 +150,7 @@ export default function NewDealPage() {
         throw new Error(error.error || 'Failed to create deal')
       }
 
-      const deal = await response.json()
+      await response.json()
       toast.success('Deal created successfully!')
       router.push('/deals')
     } catch (error) {
@@ -319,7 +318,7 @@ export default function NewDealPage() {
                             onChange={(e) => field.onChange(parseFloat(e.target.value))}
                           />
                         </FormControl>
-                        <FormDescription>Manufacturer's Suggested Retail Price</FormDescription>
+                        <FormDescription>Manufacturer&apos;s Suggested Retail Price</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}

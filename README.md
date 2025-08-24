@@ -1,6 +1,6 @@
 # CarDeals - Crowdsourced Car Pricing Platform
 
-A modern web application built with Next.js 15 that allows users to share and discover real car deal prices, similar to levels.fyi but for automotive purchases.
+A modern web application built with Next.js 15 that allows users to share and discover real car deal prices, similar to levels.fyi but for automotive purchases. car-otd.com
 
 ## Features
 
