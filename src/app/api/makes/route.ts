@@ -39,10 +39,10 @@ export async function GET() {
 
   } catch (error) {
     console.error('❌ Error in GET /api/makes:')
-    console.error('Error type:', error?.constructor?.name)
-    console.error('Error message:', error?.message)
-    console.error('Error code:', (error as any)?.code)
-    console.error('Error meta:', (error as any)?.meta)
+    console.error('Error type:', (error as Error)?.constructor?.name)
+    console.error('Error message:', (error as Error)?.message)
+    console.error('Error code:', (error as { code?: string })?.code)
+    console.error('Error meta:', (error as { meta?: unknown })?.meta)
     console.error('Full error object:', error)
     
     // Log stack trace for better debugging
@@ -54,9 +54,9 @@ export async function GET() {
       { 
         error: 'Failed to fetch makes',
         details: process.env.NODE_ENV === 'development' ? {
-          message: error?.message,
-          type: error?.constructor?.name,
-          code: (error as any)?.code
+          message: (error as Error)?.message,
+          type: (error as Error)?.constructor?.name,
+          code: (error as { code?: string })?.code
         } : undefined
       },
       { status: 500 }

@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import dynamic from 'next/dynamic'
+import { useState, useEffect, useCallback } from 'react'
+
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useForm } from 'react-hook-form'
@@ -119,11 +119,11 @@ export default function NewDealPage() {
     }
   }
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setIsLoadingData(true)
     await Promise.all([fetchMakes(), fetchModels()])
     setIsLoadingData(false)
-  }
+  }, [])
 
   const createCustomMake = async () => {
     if (!customMakeName.trim()) {
@@ -211,7 +211,7 @@ export default function NewDealPage() {
 
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [fetchData])
 
   useEffect(() => {
     if (selectedMakeId) {
