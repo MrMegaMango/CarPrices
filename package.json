@@ -13,8 +13,9 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "db:backup": "node scripts/backup-database.js",
-    "backup:manual": "node scripts/backup-database.js"
+    "db:backup": "cd scripts && go run backup.go",
+    "backup:manual": "cd scripts && go run backup.go",
+    "backup:js": "node scripts/backup-database.js"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

@@ -1,4 +1,4 @@
-name: Database Backup
+name: Database Backup - 30 Year Retention
 
 on:
   schedule:
@@ -14,54 +14,63 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Go
+        uses: actions/setup-go@v4
         with:
-          node-version: '20'
+          go-version: '1.21'
           
-      - name: Install dependencies
-        run: npm ci
-        
       - name: Install PostgreSQL client
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql-client
           
-      - name: Create backup
+      - name: Install Go dependencies
+        working-directory: ./scripts
+        run: go mod download
+        
+      - name: Configure AWS CLI (if using AWS)
+        if: env.CLOUD_PROVIDER == 'aws'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          
+      - name: Setup Google Cloud CLI (if using GCP)
+        if: env.CLOUD_PROVIDER == 'gcp'
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          
+      - name: Setup Azure CLI (if using Azure)
+        if: env.CLOUD_PROVIDER == 'azure'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      - name: Create comprehensive backup
+        working-directory: ./scripts
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: |
-          # Create backup directory
-          mkdir -p backups
-          
-          # Generate timestamp
-          TIMESTAMP=$(date -u +"%Y-%m-%dT%H-%M-%S")
-          BACKUP_FILE="backups/cardeals-backup-${TIMESTAMP}.sql"
-          
-          # Create database backup
-          pg_dump "$DATABASE_URL" > "$BACKUP_FILE"
-          
-          # Verify backup was created and has content
-          if [ -f "$BACKUP_FILE" ] && [ -s "$BACKUP_FILE" ]; then
-            echo "✅ Backup created successfully: $BACKUP_FILE"
-            echo "📊 Backup size: $(du -h "$BACKUP_FILE" | cut -f1)"
-          else
-            echo "❌ Backup failed or is empty"
-            exit 1
-          fi
-          
-      - name: Upload backup to artifacts
+          CLOUD_PROVIDER: ${{ secrets.CLOUD_PROVIDER }}
+          BACKUP_BUCKET: ${{ secrets.BACKUP_BUCKET }}
+          CLOUD_REGION: ${{ secrets.CLOUD_REGION }}
+        run: go run backup.go
+        
+      - name: Upload to GitHub artifacts (short-term)
         uses: actions/upload-artifact@v4
         with:
           name: database-backup-${{ github.run_number }}
           path: backups/
-          retention-days: 30
+          retention-days: 90
           
       - name: Notify backup completion
         if: always()
         run: |
           if [ $? -eq 0 ]; then
-            echo "✅ Backup completed successfully and uploaded to GitHub artifacts"
+            echo "✅ 30-year backup completed successfully"
+            echo "📊 Stored in cloud storage for long-term retention"
           else
             echo "❌ Backup failed"
           fi
