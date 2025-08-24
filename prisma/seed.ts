@@ -25,7 +25,7 @@ const carData = [
   },
   {
     make: 'BMW',
-    models: ['3 Series', '5 Series', 'X3', 'X5', 'X1', 'X7', '7 Series', '4 Series', 'Z4', 'i4']
+    models: ['230i', '330i', '430i', '530i', '540i', 'M3', 'M4', 'M5', 'X3 xDrive30i', 'X5 xDrive40i', 'X7 xDrive40i', 'Z4 sDrive30i', 'i4 eDrive40', 'iX xDrive50']
   },
   {
     make: 'Mercedes-Benz',
