@@ -68,6 +68,12 @@ export default function NewDealPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isClient, setIsClient] = useState(false)
   const [isLoadingData, setIsLoadingData] = useState(true)
+  const [showCustomMake, setShowCustomMake] = useState(false)
+  const [showCustomModel, setShowCustomModel] = useState(false)
+  const [customMakeName, setCustomMakeName] = useState('')
+  const [customModelName, setCustomModelName] = useState('')
+  const [isCreatingMake, setIsCreatingMake] = useState(false)
+  const [isCreatingModel, setIsCreatingModel] = useState(false)
 
   const form = useForm<DealFormData>({
     resolver: zodResolver(dealFormSchema),
@@ -117,6 +123,90 @@ export default function NewDealPage() {
     setIsLoadingData(true)
     await Promise.all([fetchMakes(), fetchModels()])
     setIsLoadingData(false)
+  }
+
+  const createCustomMake = async () => {
+    if (!customMakeName.trim()) {
+      toast.error('Please enter a make name')
+      return
+    }
+
+    setIsCreatingMake(true)
+    try {
+      const response = await fetch('/api/makes/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: customMakeName.trim() }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to create make')
+      }
+
+      const newMake = await response.json()
+      setMakes(prev => [...prev, newMake])
+      form.setValue('makeId', newMake.id)
+      setCustomMakeName('')
+      setShowCustomMake(false)
+      toast.success(`Added "${newMake.name}" to car makes`)
+    } catch (error) {
+      console.error('Error creating make:', error)
+      toast.error(error instanceof Error ? error.message : 'Failed to create make')
+    } finally {
+      setIsCreatingMake(false)
+    }
+  }
+
+  const createCustomModel = async () => {
+    if (!customModelName.trim()) {
+      toast.error('Please enter a model name')
+      return
+    }
+
+    if (!selectedMakeId) {
+      toast.error('Please select a make first')
+      return
+    }
+
+    setIsCreatingModel(true)
+    try {
+      const response = await fetch('/api/models/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          name: customModelName.trim(),
+          makeId: selectedMakeId 
+        }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to create model')
+      }
+
+      const newModel = await response.json()
+      setModels(prev => [...prev, newModel])
+      
+      // Update filtered models if the new model belongs to the selected make
+      if (newModel.makeId === selectedMakeId) {
+        setFilteredModels(prev => [...prev, newModel])
+      }
+      
+      form.setValue('modelId', newModel.id)
+      setCustomModelName('')
+      setShowCustomModel(false)
+      toast.success(`Added "${newModel.name}" to car models`)
+    } catch (error) {
+      console.error('Error creating model:', error)
+      toast.error(error instanceof Error ? error.message : 'Failed to create model')
+    } finally {
+      setIsCreatingModel(false)
+    }
   }
 
   useEffect(() => {
@@ -223,27 +313,87 @@ export default function NewDealPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Make</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select 
+                          onValueChange={(value) => {
+                            if (value === '__add_custom__') {
+                              setShowCustomMake(true)
+                              return
+                            }
+                            field.onChange(value)
+                          }} 
+                          value={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select make" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {Array.isArray(makes) && makes.length > 0 ? (
-                              makes.map((make) => (
-                                <SelectItem key={make.id} value={make.id}>
-                                  {make.name}
-                                </SelectItem>
-                              ))
-                            ) : (
+                            {Array.isArray(makes) && makes.length > 0 && makes.map((make) => (
+                              <SelectItem key={make.id} value={make.id}>
+                                {make.name}
+                              </SelectItem>
+                            ))}
+                            <SelectItem 
+                              value="__add_custom__" 
+                              onClick={(e) => {
+                                e.preventDefault()
+                                setShowCustomMake(true)
+                              }}
+                              className="text-blue-600 font-medium"
+                            >
+                              + Add Custom Make
+                            </SelectItem>
+                            {makes.length === 0 && (
                               <SelectItem value="" disabled>
-                                {makes.length === 0 ? 'Loading makes...' : 'No makes available'}
+                                Loading makes...
                               </SelectItem>
                             )}
                           </SelectContent>
                         </Select>
                         <FormMessage />
+                        
+                        {/* Custom Make Input */}
+                        {showCustomMake && (
+                          <div className="mt-2 p-3 border rounded-md bg-blue-50">
+                            <div className="flex items-center gap-2">
+                              <Input
+                                placeholder="Enter custom make name"
+                                value={customMakeName}
+                                onChange={(e) => setCustomMakeName(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    e.preventDefault()
+                                    createCustomMake()
+                                  }
+                                }}
+                              />
+                              <Button
+                                type="button"
+                                onClick={createCustomMake}
+                                disabled={isCreatingMake || !customMakeName.trim()}
+                                size="sm"
+                              >
+                                {isCreatingMake ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  'Add'
+                                )}
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => {
+                                  setShowCustomMake(false)
+                                  setCustomMakeName('')
+                                }}
+                                size="sm"
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        )}
                       </FormItem>
                     )}
                   />
@@ -254,7 +404,17 @@ export default function NewDealPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Model</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value} disabled={!selectedMakeId}>
+                        <Select 
+                          onValueChange={(value) => {
+                            if (value === '__add_custom_model__') {
+                              setShowCustomModel(true)
+                              return
+                            }
+                            field.onChange(value)
+                          }} 
+                          value={field.value} 
+                          disabled={!selectedMakeId}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select model" />
@@ -266,9 +426,68 @@ export default function NewDealPage() {
                                 {model.name}
                               </SelectItem>
                             ))}
+                            {selectedMakeId && (
+                              <SelectItem 
+                                value="__add_custom_model__" 
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  setShowCustomModel(true)
+                                }}
+                                className="text-blue-600 font-medium"
+                              >
+                                + Add Custom Model
+                              </SelectItem>
+                            )}
+                            {!selectedMakeId && (
+                              <SelectItem value="" disabled>
+                                Select a make first
+                              </SelectItem>
+                            )}
                           </SelectContent>
                         </Select>
                         <FormMessage />
+                        
+                        {/* Custom Model Input */}
+                        {showCustomModel && (
+                          <div className="mt-2 p-3 border rounded-md bg-blue-50">
+                            <div className="flex items-center gap-2">
+                              <Input
+                                placeholder="Enter custom model name"
+                                value={customModelName}
+                                onChange={(e) => setCustomModelName(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    e.preventDefault()
+                                    createCustomModel()
+                                  }
+                                }}
+                              />
+                              <Button
+                                type="button"
+                                onClick={createCustomModel}
+                                disabled={isCreatingModel || !customModelName.trim()}
+                                size="sm"
+                              >
+                                {isCreatingModel ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  'Add'
+                                )}
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => {
+                                  setShowCustomModel(false)
+                                  setCustomModelName('')
+                                }}
+                                size="sm"
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        )}
                       </FormItem>
                     )}
                   />
