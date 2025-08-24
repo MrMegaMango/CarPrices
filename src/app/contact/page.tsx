@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Navigation } from '@/components/navigation'
-import { Car, Mail, MessageSquare, Send, MapPin, Clock, Phone } from 'lucide-react'
+import { Car, Mail, MessageSquare, Send, MapPin, Clock } from 'lucide-react'
 import { toast } from 'sonner'
 
 export default function ContactPage() {
@@ -31,7 +31,7 @@ export default function ContactPage() {
       
       toast.success('Message sent successfully! We\'ll get back to you soon.')
       setFormData({ name: '', email: '', subject: '', message: '' })
-    } catch (error) {
+    } catch {
       toast.error('Something went wrong. Please try again.')
     } finally {
       setIsSubmitting(false)
@@ -57,7 +57,7 @@ export default function ContactPage() {
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Have questions about CarDeals? Need help with your account? 
-            We'd love to hear from you.
+            We&apos;d love to hear from you.
           </p>
         </div>
 
@@ -71,7 +71,7 @@ export default function ContactPage() {
                   <span>Send us a Message</span>
                 </CardTitle>
                 <CardDescription>
-                  Fill out the form below and we'll get back to you as soon as possible.
+                  Fill out the form below and we&apos;ll get back to you as soon as possible.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -196,7 +196,7 @@ export default function ContactPage() {
                 <div>
                   <p className="font-medium mb-1">How do I add a car deal?</p>
                   <p className="text-sm text-gray-600">
-                    Click "Add Deal" in the navigation or visit the deals page to share your car purchase experience.
+                    Click &quot;Add Deal&quot; in the navigation or visit the deals page to share your car purchase experience.
                   </p>
                 </div>
                 
