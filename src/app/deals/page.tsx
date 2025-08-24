@@ -137,10 +137,10 @@ export default function DealsPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Car Deals
+            Car Price Reports
           </h1>
           <p className="text-gray-600">
-            Browse real car deal prices shared by buyers like you
+            Browse real price reports shared by car buyers like you
           </p>
         </div>
 
@@ -153,13 +153,13 @@ export default function DealsPage() {
 
           <div className="flex justify-between items-center">
             <p className="text-sm text-gray-600">
-              {pagination.total} deals found
+              {pagination.total} price reports found
             </p>
           </div>
 
           {deals.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500 mb-4">No deals found matching your criteria.</p>
+              <p className="text-gray-500 mb-4">No price reports found matching your criteria.</p>
               <Button onClick={() => setFilters({})}>
                 Clear Filters
               </Button>

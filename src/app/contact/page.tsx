@@ -201,9 +201,9 @@ export default function ContactPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <p className="font-medium mb-1">How do I add a car deal?</p>
+                  <p className="font-medium mb-1">How do I share my car purchase price?</p>
                   <p className="text-sm text-gray-600">
-                    Click &quot;Add Deal&quot; in the navigation or visit the deals page to share your car purchase experience.
+                    Click &quot;Share Report&quot; in the navigation or visit the reports page to share your car purchase experience.
                   </p>
                 </div>
                 

@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -16,11 +13,11 @@ model User {
   name          String?
   image         String?
   emailVerified DateTime?
-  accounts      Account[]
-  sessions      Session[]
-  carDeals      CarDeal[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  carDeals      CarDeal[]
+  sessions      Session[]
 
   @@map("users")
 }
@@ -31,15 +28,14 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@map("accounts")
@@ -65,71 +61,61 @@ model VerificationToken {
 }
 
 model CarMake {
-  id       String     @id @default(cuid())
-  name     String     @unique
-  logo     String?
-  models   CarModel[]
-  carDeals CarDeal[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id        String     @id @default(cuid())
+  name      String     @unique
+  logo      String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  carDeals  CarDeal[]
+  models    CarModel[]
 
   @@map("car_makes")
 }
 
 model CarModel {
-  id       String    @id @default(cuid())
-  name     String
-  makeId   String
-  make     CarMake   @relation(fields: [makeId], references: [id], onDelete: Cascade)
-  carDeals CarDeal[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String    @id @default(cuid())
+  name      String
+  makeId    String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  carDeals  CarDeal[]
+  make      CarMake   @relation(fields: [makeId], references: [id], onDelete: Cascade)
 
   @@unique([name, makeId])
   @@map("car_models")
 }
 
 model CarDeal {
-  id                String      @id @default(cuid())
-  userId            String
-  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  // Car Information
-  makeId            String
-  make              CarMake     @relation(fields: [makeId], references: [id])
-  modelId           String
-  model             CarModel    @relation(fields: [modelId], references: [id])
-  year              Int
-  trim              String?
-  color             String?
-  
-  // Pricing Information
-  msrp              Int         // in cents
-  sellingPrice      Int         // in cents
-  otdPrice          Int?        // out the door price in cents
-  rebates           Int?        // in cents
-  tradeInValue      Int?        // in cents
-  
-  // Deal Details
-  dealerName        String?
-  dealerLocation    String?     // City, State
-  dealDate          DateTime
-  financingRate     Float?      // APR as decimal (5.5% = 0.055)
-  financingTerm     Int?        // months
-  downPayment       Int?        // in cents
-  monthlyPayment    Int?        // in cents
-  
-  // Additional Info
-  notes             String?
-  isLeased          Boolean     @default(false)
-  leaseTermMonths   Int?
-  mileageAllowance  Int?        // annual miles for lease
-  
-  // Metadata
-  verified          Boolean     @default(false)
-  isPublic          Boolean     @default(true)
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
+  id               String   @id @default(cuid())
+  userId           String
+  makeId           String
+  modelId          String
+  year             Int
+  trim             String?
+  color            String?
+  msrp             Int
+  sellingPrice     Int
+  otdPrice         Int?
+  rebates          Int?
+  tradeInValue     Int?
+  dealerName       String?
+  dealerLocation   String?
+  dealDate         DateTime
+  financingRate    Float?
+  financingTerm    Int?
+  downPayment      Int?
+  monthlyPayment   Int?
+  notes            String?
+  isLeased         Boolean  @default(false)
+  leaseTermMonths  Int?
+  mileageAllowance Int?
+  verified         Boolean  @default(false)
+  isPublic         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  make             CarMake  @relation(fields: [makeId], references: [id])
+  model            CarModel @relation(fields: [modelId], references: [id])
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("car_deals")
 }

@@ -82,7 +82,7 @@ export default function DealDetailPage() {
             {deal.year} {deal.make.name} {deal.model.name}
           </h1>
           <p className="text-gray-600">
-            Shared deal from our community
+            Shared price report from our community
           </p>
         </div>
         
@@ -90,10 +90,10 @@ export default function DealDetailPage() {
         
         <div className="mt-8 text-center">
           <p className="text-gray-600 mb-4">
-            Like this deal? Check out more amazing car deals from our community!
+            Find this helpful? Check out more car price reports from our community!
           </p>
           <Button asChild>
-            <Link href="/deals">Browse More Deals</Link>
+            <Link href="/deals">Browse More Reports</Link>
           </Button>
         </div>
       </div>

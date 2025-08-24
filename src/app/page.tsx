@@ -13,19 +13,19 @@ export default function Home() {
       <section className="container mx-auto px-4 py-16 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            Real Car Deal Prices from
+            Real Car Price Reports from
             <span className="text-blue-600"> Real Buyers</span>
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Discover what people actually paid for their cars. Compare MSRP, selling prices, 
-            and out-the-door costs to get the best deal on your next vehicle.
+            and out-the-door costs to make informed decisions on your next vehicle.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="text-lg px-8">
-              <Link href="/deals">Browse Deals</Link>
+              <Link href="/deals">Browse Reports</Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="text-lg px-8">
-              <Link href="/deals/new">Share Your Deal</Link>
+              <Link href="/deals/new">Share Your Report</Link>
             </Button>
           </div>
         </div>
@@ -38,7 +38,7 @@ export default function Home() {
             How CarDeals Works
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Get insights from real car buyers to make informed purchasing decisions
+            Get price transparency from real car buyers to make informed purchasing decisions
           </p>
         </div>
         
@@ -50,7 +50,7 @@ export default function Home() {
               </div>
               <CardTitle>Search & Filter</CardTitle>
               <CardDescription>
-                Find deals by make, model, year, price range, and location
+                Find price reports by make, model, year, price range, and location
               </CardDescription>
             </CardHeader>
           </Card>
@@ -72,9 +72,9 @@ export default function Home() {
               <div className="mx-auto w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
                 <Users className="h-6 w-6 text-purple-600" />
               </div>
-              <CardTitle>Share Your Deal</CardTitle>
+              <CardTitle>Share Your Report</CardTitle>
               <CardDescription>
-                Help others by sharing your car buying experience and pricing
+                Help others by sharing your car buying experience and pricing data
               </CardDescription>
             </CardHeader>
           </Card>
@@ -93,7 +93,7 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
               <div className="text-3xl font-bold text-blue-600 mb-2">10,000+</div>
-              <div className="text-gray-600">Car Deals Shared</div>
+              <div className="text-gray-600">Price Reports Shared</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-green-600 mb-2">$2.5M+</div>
@@ -124,7 +124,7 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" variant="secondary">
-                <Link href="/deals">Start Browsing</Link>
+                <Link href="/deals">Browse Reports</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-blue-600">
                 <Link href="/statistics">View Statistics</Link>

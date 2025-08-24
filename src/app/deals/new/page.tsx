@@ -174,15 +174,15 @@ export default function NewDealPage() {
 
       if (!response.ok) {
         const error = await response.json()
-        throw new Error(error.error || 'Failed to create deal')
+        throw new Error(error.error || 'Failed to create price report')
       }
 
       await response.json()
-      toast.success('Deal created successfully!')
+      toast.success('Price report created successfully!')
       router.push('/deals')
     } catch (error) {
-      console.error('Error creating deal:', error)
-      toast.error(error instanceof Error ? error.message : 'Failed to create deal')
+      console.error('Error creating price report:', error)
+      toast.error(error instanceof Error ? error.message : 'Failed to create price report')
     } finally {
       setIsSubmitting(false)
     }
@@ -199,7 +199,7 @@ export default function NewDealPage() {
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Share Your Car Deal
+              Share Your Price Report
             </h1>
             <p className="text-gray-600">
               Help others by sharing your car buying experience and pricing details
@@ -670,10 +670,10 @@ export default function NewDealPage() {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      Creating Deal...
+                      Creating Report...
                     </>
                   ) : (
-                    'Create Deal'
+                    'Create Report'
                   )}
                 </Button>
               </div>

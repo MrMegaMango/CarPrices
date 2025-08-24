@@ -4,13 +4,13 @@ A modern web application built with Next.js 15 that allows users to share and di
 
 ## Features
 
-- 🚗 **Browse Car Deals**: Search and filter real car deal prices by make, model, year, and price range
+- 🚗 **Browse Price Reports**: Search and filter real car price reports by make, model, year, and price range
 - 💰 **Price Transparency**: View MSRP vs. actual selling prices, out-the-door costs, and savings
 - 📊 **Detailed Information**: Including rebates, trade-in values, financing details, and lease information
 - 🔍 **Advanced Filtering**: Filter by make, model, year, price range, and sort by various criteria
 - 👥 **User Authentication**: Secure login with Google and GitHub OAuth
 - 📱 **Responsive Design**: Beautiful, modern UI that works on all devices
-- 🔒 **Privacy Focused**: Users control visibility of their deal information
+- 🔒 **Privacy Focused**: Users control visibility of their price information
 
 ## Tech Stack
 

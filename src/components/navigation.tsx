@@ -28,7 +28,7 @@ export function Navigation() {
             href="/deals"
             className="text-sm font-medium transition-colors hover:text-blue-600"
           >
-            Browse Deals
+            Browse Reports
           </Link>
           <Link
             href="/statistics"
@@ -45,7 +45,7 @@ export function Navigation() {
               <Button asChild variant="default" size="sm">
                 <Link href="/deals/new" className="flex items-center space-x-1">
                   <Plus className="h-4 w-4" />
-                  <span>Add Deal</span>
+                  <span>Share Report</span>
                 </Link>
               </Button>
               
