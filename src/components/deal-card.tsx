@@ -5,12 +5,15 @@ import { Badge } from '@/components/ui/badge'
 import { CalendarDays, MapPin, TrendingDown, DollarSign } from 'lucide-react'
 import { CarDealWithRelations } from '@/types'
 import { formatDistance } from 'date-fns'
+import { useSession } from 'next-auth/react'
+import { ShareDeal } from './share-deal'
 
 interface DealCardProps {
   deal: CarDealWithRelations
 }
 
 export function DealCard({ deal }: DealCardProps) {
+  const { data: session } = useSession()
   const savings = deal.msrp - deal.sellingPrice
   const savingsPercentage = ((savings / deal.msrp) * 100).toFixed(1)
   
@@ -35,12 +38,15 @@ export function DealCard({ deal }: DealCardProps) {
               <p className="text-sm text-muted-foreground">{deal.trim}</p>
             )}
           </div>
-          {savings > 0 && (
-            <Badge variant="secondary" className="bg-green-100 text-green-800">
-              <TrendingDown className="h-3 w-3 mr-1" />
-              {savingsPercentage}% off
-            </Badge>
-          )}
+          <div className="flex items-center space-x-2">
+            {savings > 0 && (
+              <Badge variant="secondary" className="bg-green-100 text-green-800">
+                <TrendingDown className="h-3 w-3 mr-1" />
+                {savingsPercentage}% off
+              </Badge>
+            )}
+            {session && <ShareDeal deal={deal} />}
+          </div>
         </div>
       </CardHeader>
       
