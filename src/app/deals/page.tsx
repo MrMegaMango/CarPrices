@@ -33,18 +33,6 @@ export default function DealsPage() {
   })
   const [filters, setFilters] = useState({})
 
-  useEffect(() => {
-    fetchMakes()
-    fetchModels()
-    fetchDeals()
-  }, [fetchDeals])
-
-  useEffect(() => {
-    if (Object.keys(filters).length > 0) {
-      fetchDeals(true)
-    }
-  }, [filters, fetchDeals])
-
   const fetchMakes = async () => {
     try {
       const response = await fetch('/api/makes')
@@ -97,6 +85,18 @@ export default function DealsPage() {
       setLoadingMore(false)
     }
   }, [pagination.page, pagination.limit, filters])
+
+  useEffect(() => {
+    fetchMakes()
+    fetchModels()
+    fetchDeals()
+  }, [fetchDeals])
+
+  useEffect(() => {
+    if (Object.keys(filters).length > 0) {
+      fetchDeals(true)
+    }
+  }, [filters, fetchDeals])
 
   const loadMore = () => {
     if (pagination.page < pagination.pages) {

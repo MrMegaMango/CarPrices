@@ -51,7 +51,7 @@ const dealFormSchema = z.object({
   downPayment: z.number().optional(),
   monthlyPayment: z.number().optional(),
   notes: z.string().optional(),
-  isLeased: z.boolean().default(false),
+  isLeased: z.boolean(),
   leaseTermMonths: z.number().optional(),
   mileageAllowance: z.number().optional(),
 })
