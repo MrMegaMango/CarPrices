@@ -210,13 +210,13 @@ func getTableNames(db *sql.DB) ([]string, error) {
 		AND table_type = 'BASE TABLE'
 		ORDER BY table_name
 	`
-	
+
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	
+
 	var tables []string
 	for rows.Next() {
 		var tableName string
@@ -225,7 +225,7 @@ func getTableNames(db *sql.DB) ([]string, error) {
 		}
 		tables = append(tables, tableName)
 	}
-	
+
 	return tables, nil
 }
 

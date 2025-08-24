@@ -1,4 +1,4 @@
-name: Database Backup - 30 Year Retention
+name: Database Backup
 
 on:
   schedule:
@@ -19,10 +19,16 @@ jobs:
         with:
           go-version: '1.21'
           
-      - name: Install PostgreSQL client
+      - name: Install PostgreSQL 17 client
         run: |
+          # Add PostgreSQL official APT repository
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/postgresql.gpg
+          echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
           sudo apt-get update
-          sudo apt-get install -y postgresql-client
+          sudo apt-get install -y postgresql-client-17
+          
+      - name: Verify PostgreSQL version
+        run: pg_dump --version
           
       - name: Install Go dependencies
         working-directory: ./scripts
