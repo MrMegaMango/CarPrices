@@ -913,10 +913,10 @@ export default function NewDealPage() {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      Creating Report...
+                      Submitting...
                     </>
                   ) : (
-                    'Create Report'
+                    'Submit'
                   )}
                 </Button>
               </div>
