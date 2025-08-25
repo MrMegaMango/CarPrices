@@ -28,6 +28,8 @@ export type CarDeal = {
   year: number
   trim: string | null
   color: string | null
+  exteriorColor: string | null
+  interiorColor: string | null
   msrp: number
   sellingPrice: number
   otdPrice: number | null

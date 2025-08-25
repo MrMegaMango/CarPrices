@@ -38,7 +38,8 @@ const dealFormSchema = z.object({
   modelId: z.string().min(1, 'Please select a model'),
   year: z.number().min(1990).max(new Date().getFullYear() + 2),
   trim: z.string().optional(),
-  color: z.string().optional(),
+  exteriorColor: z.string().optional(),
+  interiorColor: z.string().optional(),
   msrp: z.number().positive('MSRP must be positive'),
   sellingPrice: z.number().positive('Selling price must be positive'),
   otdPrice: z.number().positive().optional(),
@@ -533,12 +534,26 @@ export default function NewDealPage() {
 
                   <FormField
                     control={form.control}
-                    name="color"
+                    name="exteriorColor"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Color (Optional)</FormLabel>
+                        <FormLabel>Exterior Color (Optional)</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g., Red, Blue, White" {...field} />
+                          <Input placeholder="e.g., Deep Blue" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="interiorColor"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Interior Color (Optional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., Black" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

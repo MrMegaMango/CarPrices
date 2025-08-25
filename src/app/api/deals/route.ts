@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { Session } from 'next-auth'
 import { sql } from '@/lib/db'
+import { ensureCarDealsColorColumns } from '@/lib/db-migrate'
 import { authOptions } from '@/lib/auth'
 import { z } from 'zod'
 
@@ -11,6 +12,8 @@ const dealSchema = z.object({
   year: z.number().min(1990).max(new Date().getFullYear() + 2),
   trim: z.string().optional(),
   color: z.string().optional(),
+  exteriorColor: z.string().optional(),
+  interiorColor: z.string().optional(),
   msrp: z.number().positive(),
   sellingPrice: z.number().positive(),
   otdPrice: z.number().positive().optional(),
@@ -124,6 +127,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    await ensureCarDealsColorColumns()
     const session = await getServerSession(authOptions) as Session & { user: { id: string } } | null
     
     if (!session?.user?.id) {
@@ -147,17 +151,19 @@ export async function POST(request: NextRequest) {
       downPayment: validatedData.downPayment ? Math.round(validatedData.downPayment * 100) : null,
       monthlyPayment: validatedData.monthlyPayment ? Math.round(validatedData.monthlyPayment * 100) : null,
       userId: session.user.id,
+      exteriorColor: validatedData.exteriorColor ?? validatedData.color ?? null,
+      interiorColor: validatedData.interiorColor ?? null,
     }
 
     const inserted = await sql`
       insert into car_deals (
-        "userId", "makeId", "modelId", year, trim, color,
+        "userId", "makeId", "modelId", year, trim, color, "exteriorColor", "interiorColor",
         msrp, "sellingPrice", "otdPrice", rebates, "tradeInValue",
         "dealerName", "dealerLocation", "dealDate", "financingRate",
         "financingTerm", "downPayment", "monthlyPayment", notes, "isLeased",
         "leaseTermMonths", "mileageAllowance", verified, "isPublic"
       ) values (
-        ${dealData.userId}, ${dealData.makeId}, ${dealData.modelId}, ${dealData.year}, ${dealData.trim ?? null}, ${dealData.color ?? null},
+        ${dealData.userId}, ${dealData.makeId}, ${dealData.modelId}, ${dealData.year}, ${dealData.trim ?? null}, ${dealData.color ?? null}, ${dealData.exteriorColor ?? null}, ${dealData.interiorColor ?? null},
         ${dealData.msrp}, ${dealData.sellingPrice}, ${dealData.otdPrice ?? null}, ${dealData.rebates ?? null}, ${dealData.tradeInValue ?? null},
         ${dealData.dealerName ?? null}, ${dealData.dealerLocation ?? null}, ${dealData.dealDate}, ${dealData.financingRate ?? null},
         ${dealData.financingTerm ?? null}, ${dealData.downPayment ?? null}, ${dealData.monthlyPayment ?? null}, ${dealData.notes ?? null}, ${dealData.isLeased},
