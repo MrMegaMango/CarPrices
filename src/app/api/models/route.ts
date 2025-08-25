@@ -28,7 +28,8 @@ export async function GET(request: NextRequest) {
       from car_models mo
       join car_makes ma on ma.id = mo."makeId"
       left join car_deals d on d."modelId" = mo.id
-      ${makeId ? sql`where mo."makeId" = ${makeId}` : sql``}
+      where 1=1
+      ${makeId ? sql` and mo."makeId" = ${makeId}` : sql``}
       group by mo.id, mo.name, mo."makeId", mo."createdAt", mo."updatedAt", ma.id, ma.name, ma.logo, ma."createdAt", ma."updatedAt"
       order by mo.name asc
     ` as Array<{
@@ -49,15 +50,15 @@ export async function GET(request: NextRequest) {
       id: r.id,
       name: r.name,
       makeId: r.makeId,
-      createdAt: r.createdAt as unknown as Date,
-      updatedAt: r.updatedAt as unknown as Date,
+      createdAt: r.createdAt,
+      updatedAt: r.updatedAt,
       _count: { carDeals: r.carDealsCount },
       make: {
         id: r['make.id'],
         name: r['make.name'],
         logo: r['make.logo'],
-        createdAt: r['make.createdAt'] as unknown as Date,
-        updatedAt: r['make.updatedAt'] as unknown as Date,
+        createdAt: r['make.createdAt'],
+        updatedAt: r['make.updatedAt'],
       }
     }))
 
