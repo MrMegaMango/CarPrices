@@ -525,7 +525,7 @@ export default function NewDealPage() {
                       <FormItem>
                         <FormLabel>Trim (Optional)</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g., LX, EX, Sport" {...field} />
+                          <Input placeholder="e.g., LX, EX, Sport" className="placeholder:text-muted-foreground" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -539,7 +539,7 @@ export default function NewDealPage() {
                       <FormItem>
                         <FormLabel>Exterior Color (Optional)</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g., Deep Blue" {...field} />
+                          <Input placeholder="e.g., Deep Blue" className="placeholder:text-muted-foreground" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -553,7 +553,7 @@ export default function NewDealPage() {
                       <FormItem>
                         <FormLabel>Interior Color (Optional)</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g., Black" {...field} />
+                          <Input placeholder="e.g., Black" className="placeholder:text-muted-foreground" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -581,7 +581,8 @@ export default function NewDealPage() {
                           <Input 
                             type="text" 
                             inputMode="decimal"
-                            placeholder="35000" 
+                            placeholder="e.g., 35,000" 
+                            className="placeholder:text-muted-foreground"
                             {...field}
                             onChange={(e) => field.onChange(parseFloat(e.target.value))}
                           />
@@ -602,7 +603,8 @@ export default function NewDealPage() {
                           <Input 
                             type="text" 
                             inputMode="decimal"
-                            placeholder="32000" 
+                            placeholder="e.g., 32,000" 
+                            className="placeholder:text-muted-foreground"
                             {...field}
                             onChange={(e) => field.onChange(parseFloat(e.target.value))}
                           />
@@ -623,7 +625,8 @@ export default function NewDealPage() {
                           <Input 
                             type="text" 
                             inputMode="decimal"
-                            placeholder="34500" 
+                            placeholder="e.g., 34,500" 
+                            className="placeholder:text-muted-foreground"
                             {...field}
                             value={field.value ?? ''}
                             onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
@@ -645,7 +648,8 @@ export default function NewDealPage() {
                           <Input 
                             type="text" 
                             inputMode="decimal"
-                            placeholder="2000" 
+                            placeholder="e.g., 2,000" 
+                            className="placeholder:text-muted-foreground"
                             {...field}
                             value={field.value ?? ''}
                             onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
@@ -666,7 +670,8 @@ export default function NewDealPage() {
                           <Input 
                             type="text" 
                             inputMode="decimal"
-                            placeholder="8000" 
+                            placeholder="e.g., 8,000" 
+                            className="placeholder:text-muted-foreground"
                             {...field}
                             value={field.value ?? ''}
                             onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
@@ -760,7 +765,8 @@ export default function NewDealPage() {
                               <Input 
                                 type="text" 
                                 inputMode="decimal"
-                                placeholder="5.5" 
+                                placeholder="e.g., 5.5" 
+                                className="placeholder:text-muted-foreground"
                                 {...field}
                                 value={field.value ?? ''}
                                 onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
@@ -781,7 +787,8 @@ export default function NewDealPage() {
                               <Input 
                                 type="text" 
                                 inputMode="numeric"
-                                placeholder="60" 
+                                placeholder="e.g., 60" 
+                                className="placeholder:text-muted-foreground"
                                 {...field}
                                 value={field.value ?? ''}
                                 onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
@@ -802,7 +809,8 @@ export default function NewDealPage() {
                               <Input 
                                 type="text" 
                                 inputMode="decimal"
-                                placeholder="5000" 
+                                placeholder="e.g., 5,000" 
+                                className="placeholder:text-muted-foreground"
                                 {...field}
                                 value={field.value ?? ''}
                                 onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
@@ -827,7 +835,8 @@ export default function NewDealPage() {
                               <Input 
                                 type="text" 
                                 inputMode="numeric"
-                                placeholder="36" 
+                                placeholder="e.g., 36" 
+                                className="placeholder:text-muted-foreground"
                                 {...field}
                                 value={field.value ?? ''}
                                 onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
@@ -848,7 +857,8 @@ export default function NewDealPage() {
                               <Input 
                                 type="text" 
                                 inputMode="numeric"
-                                placeholder="12000" 
+                                placeholder="e.g., 12,000" 
+                                className="placeholder:text-muted-foreground"
                                 {...field}
                                 value={field.value ?? ''}
                                 onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
@@ -871,7 +881,8 @@ export default function NewDealPage() {
                           <Input 
                             type="text" 
                             inputMode="decimal"
-                            placeholder="450" 
+                            placeholder="e.g., 450" 
+                            className="placeholder:text-muted-foreground"
                             {...field}
                             value={field.value ?? ''}
                             onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
