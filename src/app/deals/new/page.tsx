@@ -579,7 +579,8 @@ export default function NewDealPage() {
                         <FormLabel>MSRP ($)</FormLabel>
                         <FormControl>
                           <Input 
-                            type="number" 
+                            type="text" 
+                            inputMode="decimal"
                             placeholder="35000" 
                             {...field}
                             onChange={(e) => field.onChange(parseFloat(e.target.value))}
@@ -599,7 +600,8 @@ export default function NewDealPage() {
                         <FormLabel>Sale price (before taxes/fees) ($)</FormLabel>
                         <FormControl>
                           <Input 
-                            type="number" 
+                            type="text" 
+                            inputMode="decimal"
                             placeholder="32000" 
                             {...field}
                             onChange={(e) => field.onChange(parseFloat(e.target.value))}
@@ -619,7 +621,8 @@ export default function NewDealPage() {
                         <FormLabel>Out-the-Door Price ($) (Optional)</FormLabel>
                         <FormControl>
                           <Input 
-                            type="number" 
+                            type="text" 
+                            inputMode="decimal"
                             placeholder="34500" 
                             {...field}
                             value={field.value ?? ''}
@@ -640,7 +643,8 @@ export default function NewDealPage() {
                         <FormLabel>Rebates/Incentives ($) (Optional)</FormLabel>
                         <FormControl>
                           <Input 
-                            type="number" 
+                            type="text" 
+                            inputMode="decimal"
                             placeholder="2000" 
                             {...field}
                             value={field.value ?? ''}
@@ -660,7 +664,8 @@ export default function NewDealPage() {
                         <FormLabel>Trade-in Value ($) (Optional)</FormLabel>
                         <FormControl>
                           <Input 
-                            type="number" 
+                            type="text" 
+                            inputMode="decimal"
                             placeholder="8000" 
                             {...field}
                             value={field.value ?? ''}
@@ -753,8 +758,8 @@ export default function NewDealPage() {
                             <FormLabel>Financing Rate (%) (Optional)</FormLabel>
                             <FormControl>
                               <Input 
-                                type="number" 
-                                step="0.01" 
+                                type="text" 
+                                inputMode="decimal"
                                 placeholder="5.5" 
                                 {...field}
                                 value={field.value ?? ''}
@@ -774,7 +779,8 @@ export default function NewDealPage() {
                             <FormLabel>Financing Term (months) (Optional)</FormLabel>
                             <FormControl>
                               <Input 
-                                type="number" 
+                                type="text" 
+                                inputMode="numeric"
                                 placeholder="60" 
                                 {...field}
                                 value={field.value ?? ''}
@@ -794,7 +800,8 @@ export default function NewDealPage() {
                             <FormLabel>Down Payment ($) (Optional)</FormLabel>
                             <FormControl>
                               <Input 
-                                type="number" 
+                                type="text" 
+                                inputMode="decimal"
                                 placeholder="5000" 
                                 {...field}
                                 value={field.value ?? ''}
@@ -818,7 +825,8 @@ export default function NewDealPage() {
                             <FormLabel>Lease Term (months) (Optional)</FormLabel>
                             <FormControl>
                               <Input 
-                                type="number" 
+                                type="text" 
+                                inputMode="numeric"
                                 placeholder="36" 
                                 {...field}
                                 value={field.value ?? ''}
@@ -838,7 +846,8 @@ export default function NewDealPage() {
                             <FormLabel>Annual Mileage Allowance (Optional)</FormLabel>
                             <FormControl>
                               <Input 
-                                type="number" 
+                                type="text" 
+                                inputMode="numeric"
                                 placeholder="12000" 
                                 {...field}
                                 value={field.value ?? ''}
@@ -860,7 +869,8 @@ export default function NewDealPage() {
                         <FormLabel>Monthly Payment ($) (Optional)</FormLabel>
                         <FormControl>
                           <Input 
-                            type="number" 
+                            type="text" 
+                            inputMode="decimal"
                             placeholder="450" 
                             {...field}
                             value={field.value ?? ''}
