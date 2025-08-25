@@ -57,7 +57,7 @@ export function DealCard({ deal }: DealCardProps) {
             <p className="font-semibold text-lg">{formatPrice(deal.msrp)}</p>
           </div>
           <div className="space-y-1">
-            <p className="text-sm text-muted-foreground">Selling Price</p>
+            <p className="text-sm text-muted-foreground">Sale Price</p>
             <p className="font-semibold text-lg text-blue-600">
               {formatPrice(deal.sellingPrice)}
             </p>

@@ -596,7 +596,7 @@ export default function NewDealPage() {
                     name="sellingPrice"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Selling Price ($)</FormLabel>
+                        <FormLabel>Sale price (before taxes/fees) ($)</FormLabel>
                         <FormControl>
                           <Input 
                             type="number" 
@@ -605,7 +605,7 @@ export default function NewDealPage() {
                             onChange={(e) => field.onChange(parseFloat(e.target.value))}
                           />
                         </FormControl>
-                        <FormDescription>Final negotiated price before taxes/fees</FormDescription>
+                        <FormDescription>The final negotiated vehicle price before taxes, title, license, and dealer fees.</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
