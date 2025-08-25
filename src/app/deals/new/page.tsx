@@ -622,6 +622,7 @@ export default function NewDealPage() {
                             type="number" 
                             placeholder="34500" 
                             {...field}
+                            value={field.value ?? ''}
                             onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
                           />
                         </FormControl>
@@ -642,6 +643,7 @@ export default function NewDealPage() {
                             type="number" 
                             placeholder="2000" 
                             {...field}
+                            value={field.value ?? ''}
                             onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
                           />
                         </FormControl>
@@ -661,6 +663,7 @@ export default function NewDealPage() {
                             type="number" 
                             placeholder="8000" 
                             {...field}
+                            value={field.value ?? ''}
                             onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
                           />
                         </FormControl>
@@ -754,6 +757,7 @@ export default function NewDealPage() {
                                 step="0.01" 
                                 placeholder="5.5" 
                                 {...field}
+                                value={field.value ?? ''}
                                 onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
                               />
                             </FormControl>
@@ -773,6 +777,7 @@ export default function NewDealPage() {
                                 type="number" 
                                 placeholder="60" 
                                 {...field}
+                                value={field.value ?? ''}
                                 onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                               />
                             </FormControl>
@@ -792,6 +797,7 @@ export default function NewDealPage() {
                                 type="number" 
                                 placeholder="5000" 
                                 {...field}
+                                value={field.value ?? ''}
                                 onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
                               />
                             </FormControl>
@@ -815,6 +821,7 @@ export default function NewDealPage() {
                                 type="number" 
                                 placeholder="36" 
                                 {...field}
+                                value={field.value ?? ''}
                                 onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                               />
                             </FormControl>
@@ -834,6 +841,7 @@ export default function NewDealPage() {
                                 type="number" 
                                 placeholder="12000" 
                                 {...field}
+                                value={field.value ?? ''}
                                 onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                               />
                             </FormControl>
@@ -855,6 +863,7 @@ export default function NewDealPage() {
                             type="number" 
                             placeholder="450" 
                             {...field}
+                            value={field.value ?? ''}
                             onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
                           />
                         </FormControl>
