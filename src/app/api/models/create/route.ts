@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { sql } from '@/lib/db'
 
 export async function POST(request: Request) {
   try {
@@ -20,11 +20,9 @@ export async function POST(request: Request) {
     }
 
     // Verify make exists
-    const make = await prisma.carMake.findUnique({
-      where: { id: makeId }
-    })
+    const make = await sql`select id from car_makes where id = ${makeId} limit 1` as Array<{ id: string }>
 
-    if (!make) {
+    if (make.length === 0) {
       return NextResponse.json(
         { error: 'Make not found' },
         { status: 404 }
@@ -32,17 +30,13 @@ export async function POST(request: Request) {
     }
 
     // Check if model already exists for this make (case insensitive)
-    const existingModel = await prisma.carModel.findFirst({
-      where: {
-        name: {
-          equals: name.trim(),
-          mode: 'insensitive'
-        },
-        makeId: makeId
-      }
-    })
+    const existingModel = await sql`
+      select id from car_models 
+      where lower(name) = lower(${name.trim()}) and "makeId" = ${makeId}
+      limit 1
+    ` as Array<{ id: string }>
 
-    if (existingModel) {
+    if (existingModel.length > 0) {
       return NextResponse.json(
         { error: 'This model already exists for this make' },
         { status: 409 }
@@ -50,17 +44,32 @@ export async function POST(request: Request) {
     }
 
     // Create new model
-    const newModel = await prisma.carModel.create({
-      data: {
-        name: name.trim(),
-        makeId: makeId
-      },
-      include: {
-        make: true
+    const inserted = await sql`
+      insert into car_models (name, "makeId")
+      values (${name.trim()}, ${makeId})
+      returning id, name, "makeId", "createdAt", "updatedAt"
+    ` as Array<{ id: string; name: string; makeId: string; createdAt: string; updatedAt: string }>
+
+    const created = inserted[0]
+    const makeRow = await sql`
+      select id, name, logo, "createdAt", "updatedAt" from car_makes where id = ${created.makeId}
+    ` as Array<{ id: string; name: string; logo: string | null; createdAt: string; updatedAt: string }>
+    const makeData = makeRow[0]
+
+    return NextResponse.json({
+      id: created.id,
+      name: created.name,
+      makeId: created.makeId,
+      createdAt: created.createdAt as unknown as Date,
+      updatedAt: created.updatedAt as unknown as Date,
+      make: makeData && {
+        id: makeData.id,
+        name: makeData.name,
+        logo: makeData.logo,
+        createdAt: makeData.createdAt as unknown as Date,
+        updatedAt: makeData.updatedAt as unknown as Date,
       }
     })
-
-    return NextResponse.json(newModel)
   } catch (error) {
     console.error('Error creating model:', error)
     return NextResponse.json(

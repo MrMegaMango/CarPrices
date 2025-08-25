@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { sql } from '@/lib/db'
 
 export async function GET(
   request: Request,
@@ -7,21 +7,21 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const deal = await prisma.carDeal.findUnique({
-      where: {
-        id: id,
-      },
-      include: {
-        make: true,
-        model: true,
-        user: {
-          select: {
-            name: true,
-            email: true,
-          },
-        },
-      },
-    })
+    const rows = await sql`
+      select 
+        d.*,
+        ma.name as "make.name",
+        mo.name as "model.name",
+        u.name as "user.name",
+        u.email as "user.email"
+      from car_deals d
+      join car_makes ma on ma.id = d."makeId"
+      join car_models mo on mo.id = d."modelId"
+      join users u on u.id = d."userId"
+      where d.id = ${id}
+      limit 1
+    ` as Array<Record<string, unknown>>
+    const deal = rows[0]
 
     if (!deal) {
       return NextResponse.json(

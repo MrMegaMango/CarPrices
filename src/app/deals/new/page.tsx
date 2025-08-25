@@ -31,7 +31,7 @@ import {
 } from '@/components/ui/form'
 import { toast } from 'sonner'
 import { Loader2, Car, DollarSign, Calendar } from 'lucide-react'
-import { CarMake, CarModel } from '@prisma/client'
+import { CarMake, CarModel } from '@/types'
 
 const dealFormSchema = z.object({
   makeId: z.string().min(1, 'Please select a make'),

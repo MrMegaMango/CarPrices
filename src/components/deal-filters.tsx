@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Filter, X } from 'lucide-react'
-import { CarMake, CarModel } from '@prisma/client'
+import { CarMake, CarModel } from '@/types'
 
 interface DealFiltersProps {
   makes: CarMake[]

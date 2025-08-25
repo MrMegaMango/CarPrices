@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { sql } from '@/lib/db'
 
 const carData = [
   {
@@ -89,26 +89,15 @@ export async function POST() {
     console.log('Start seeding production database...')
 
     for (const { make, models } of carData) {
-      const createdMake = await prisma.carMake.upsert({
-        where: { name: make },
-        update: {},
-        create: { name: make },
-      })
+      const makeRows = await sql`insert into car_makes (name) values (${make}) on conflict (name) do update set name = excluded.name returning id` as Array<{ id: string }>
+      const makeId = makeRows[0].id
 
       for (const modelName of models) {
-        await prisma.carModel.upsert({
-          where: { 
-            name_makeId: {
-              name: modelName,
-              makeId: createdMake.id
-            }
-          },
-          update: {},
-          create: {
-            name: modelName,
-            makeId: createdMake.id,
-          },
-        })
+        await sql`
+          insert into car_models (name, "makeId")
+          values (${modelName}, ${makeId})
+          on conflict (name, "makeId") do update set name = excluded.name
+        `
       }
 
       console.log(`Created make: ${make} with ${models.length} models`)

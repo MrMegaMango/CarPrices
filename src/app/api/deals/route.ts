@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { Session } from 'next-auth'
-import { prisma } from '@/lib/prisma'
+import { sql } from '@/lib/db'
 import { authOptions } from '@/lib/auth'
 import { z } from 'zod'
 
@@ -65,39 +65,44 @@ export async function GET(request: NextRequest) {
       if (maxPrice) where.sellingPrice.lte = parseInt(maxPrice) * 100 // Convert to cents
     }
 
-    let orderBy: Record<string, string> = {}
-    switch (sortBy) {
-      case 'price':
-        orderBy = { sellingPrice: sortOrder }
-        break
-      case 'savings':
-        // This would need a computed field in real implementation
-        orderBy = { createdAt: sortOrder }
-        break
-      default:
-        orderBy = { createdAt: sortOrder }
-    }
+    // Sorting handled inline in SQL below
 
-    const [deals, total] = await Promise.all([
-      prisma.carDeal.findMany({
-        where,
-        include: {
-          make: true,
-          model: true,
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
-        },
-        orderBy,
-        skip: (page - 1) * limit,
-        take: limit,
-      }),
-      prisma.carDeal.count({ where }),
-    ])
+    const deals = await sql`
+      select 
+        d.*,
+        ma.name as "make.name",
+        mo.name as "model.name",
+        u.id as "user.id",
+        u.name as "user.name",
+        u.email as "user.email"
+      from car_deals d
+      join car_makes ma on ma.id = d."makeId"
+      join car_models mo on mo.id = d."modelId"
+      join users u on u.id = d."userId"
+      where d."isPublic" = true
+      ${makeId ? sql` and d."makeId" = ${makeId}` : sql``}
+      ${modelId ? sql` and d."modelId" = ${modelId}` : sql``}
+      ${year ? sql` and d.year = ${parseInt(year)}` : sql``}
+      ${minPrice ? sql` and d."sellingPrice" >= ${parseInt(minPrice) * 100}` : sql``}
+      ${maxPrice ? sql` and d."sellingPrice" <= ${parseInt(maxPrice) * 100}` : sql``}
+      ${sortBy === 'price'
+        ? (sortOrder === 'asc' ? sql`order by d."sellingPrice" asc` : sql`order by d."sellingPrice" desc`)
+        : (sortOrder === 'asc' ? sql`order by d."createdAt" asc` : sql`order by d."createdAt" desc`)}
+      offset ${(page - 1) * limit}
+      limit ${limit}
+    ` as Array<Record<string, unknown>>
+
+    const totalRows = await sql`
+      select count(*)::int as count
+      from car_deals d
+      where d."isPublic" = true
+      ${makeId ? sql` and d."makeId" = ${makeId}` : sql``}
+      ${modelId ? sql` and d."modelId" = ${modelId}` : sql``}
+      ${year ? sql` and d.year = ${parseInt(year)}` : sql``}
+      ${minPrice ? sql` and d."sellingPrice" >= ${parseInt(minPrice) * 100}` : sql``}
+      ${maxPrice ? sql` and d."sellingPrice" <= ${parseInt(maxPrice) * 100}` : sql``}
+    ` as Array<{ count: number }>
+    const total = totalRows[0]?.count ?? 0
 
     return NextResponse.json({
       deals,
@@ -144,20 +149,34 @@ export async function POST(request: NextRequest) {
       userId: session.user.id,
     }
 
-    const deal = await prisma.carDeal.create({
-      data: dealData,
-      include: {
-        make: true,
-        model: true,
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
-    })
+    const inserted = await sql`
+      insert into car_deals (
+        "userId", "makeId", "modelId", year, trim, color,
+        msrp, "sellingPrice", "otdPrice", rebates, "tradeInValue",
+        "dealerName", "dealerLocation", "dealDate", "financingRate",
+        "financingTerm", "downPayment", "monthlyPayment", notes, "isLeased",
+        "leaseTermMonths", "mileageAllowance", verified, "isPublic"
+      ) values (
+        ${dealData.userId}, ${dealData.makeId}, ${dealData.modelId}, ${dealData.year}, ${dealData.trim ?? null}, ${dealData.color ?? null},
+        ${dealData.msrp}, ${dealData.sellingPrice}, ${dealData.otdPrice ?? null}, ${dealData.rebates ?? null}, ${dealData.tradeInValue ?? null},
+        ${dealData.dealerName ?? null}, ${dealData.dealerLocation ?? null}, ${dealData.dealDate}, ${dealData.financingRate ?? null},
+        ${dealData.financingTerm ?? null}, ${dealData.downPayment ?? null}, ${dealData.monthlyPayment ?? null}, ${dealData.notes ?? null}, ${dealData.isLeased},
+        ${dealData.leaseTermMonths ?? null}, ${dealData.mileageAllowance ?? null}, false, true
+      )
+      returning *
+    ` as Array<Record<string, unknown>>
+
+    const dealRow = inserted[0] as { makeId: string; modelId: string; userId: string }
+    const makeRow = await sql`select id, name from car_makes where id = ${dealRow.makeId}` as Array<{ id: string; name: string }>
+    const modelRow = await sql`select id, name from car_models where id = ${dealRow.modelId}` as Array<{ id: string; name: string }>
+    const userRow = await sql`select id, name, email from users where id = ${dealRow.userId}` as Array<{ id: string; name: string | null; email: string }>
+
+    const deal = {
+      ...dealRow,
+      make: makeRow[0],
+      model: modelRow[0],
+      user: userRow[0],
+    }
 
     return NextResponse.json(deal, { status: 201 })
   } catch (error) {

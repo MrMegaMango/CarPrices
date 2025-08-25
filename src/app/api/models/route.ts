@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { sql } from '@/lib/db'
 
 export async function GET(request: NextRequest) {
   console.log('🚀 GET /api/models - Request started')
@@ -11,24 +11,55 @@ export async function GET(request: NextRequest) {
     console.log('📊 Request params:', { makeId })
     console.log('🔍 Database URL exists:', !!process.env.DATABASE_URL)
 
-    const where = makeId ? { makeId } : {}
-    
-    console.log('📝 Executing findMany query for CarModel with where:', where)
+    console.log('📝 Executing SQL query for car models...')
+    const rows = await sql`
+      select 
+        mo.id,
+        mo.name,
+        mo."makeId" as "makeId",
+        mo."createdAt" as "createdAt",
+        mo."updatedAt" as "updatedAt",
+        coalesce(count(d.id), 0)::int as "carDealsCount",
+        ma.id as "make.id",
+        ma.name as "make.name",
+        ma.logo as "make.logo",
+        ma."createdAt" as "make.createdAt",
+        ma."updatedAt" as "make.updatedAt"
+      from car_models mo
+      join car_makes ma on ma.id = mo."makeId"
+      left join car_deals d on d."modelId" = mo.id
+      ${makeId ? sql`where mo."makeId" = ${makeId}` : sql``}
+      group by mo.id, mo.name, mo."makeId", mo."createdAt", mo."updatedAt", ma.id, ma.name, ma.logo, ma."createdAt", ma."updatedAt"
+      order by mo.name asc
+    ` as Array<{
+      id: string
+      name: string
+      makeId: string
+      createdAt: string
+      updatedAt: string
+      carDealsCount: number
+      'make.id': string
+      'make.name': string
+      'make.logo': string | null
+      'make.createdAt': string
+      'make.updatedAt': string
+    }>
 
-    // Test connection first
-    await prisma.$connect()
-    console.log('✅ Prisma connection successful')
-
-    const models = await prisma.carModel.findMany({
-      where,
-      include: {
-        make: true,
-        _count: {
-          select: { carDeals: true }
-        }
-      },
-      orderBy: { name: 'asc' }
-    })
+    const models = rows.map((r) => ({
+      id: r.id,
+      name: r.name,
+      makeId: r.makeId,
+      createdAt: r.createdAt as unknown as Date,
+      updatedAt: r.updatedAt as unknown as Date,
+      _count: { carDeals: r.carDealsCount },
+      make: {
+        id: r['make.id'],
+        name: r['make.name'],
+        logo: r['make.logo'],
+        createdAt: r['make.createdAt'] as unknown as Date,
+        updatedAt: r['make.updatedAt'] as unknown as Date,
+      }
+    }))
 
     console.log('✅ Query successful, found', models.length, 'models')
     return NextResponse.json(models)

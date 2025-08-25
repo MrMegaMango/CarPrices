@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { sql } from '@/lib/db'
 
 export async function GET() {
   try {
-    // Test database connection
-    await prisma.$connect()
-    
-    // Try to count makes
-    const makeCount = await prisma.carMake.count()
+    // Test database by counting makes
+    const countRows = await sql`select count(*)::int as count from car_makes` as Array<{ count: number }>
+    const makeCount = countRows[0]?.count ?? 0
     
     return NextResponse.json({ 
       status: 'healthy',

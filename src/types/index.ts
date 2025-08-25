@@ -1,9 +1,59 @@
-import { CarDeal, CarMake, CarModel, User } from '@prisma/client'
+export type CarMake = {
+  id: string
+  name: string
+  logo: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+export type CarModel = {
+  id: string
+  name: string
+  makeId: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export type UserLite = {
+  id: string
+  name: string | null
+  email: string
+}
+
+export type CarDeal = {
+  id: string
+  userId: string
+  makeId: string
+  modelId: string
+  year: number
+  trim: string | null
+  color: string | null
+  msrp: number
+  sellingPrice: number
+  otdPrice: number | null
+  rebates: number | null
+  tradeInValue: number | null
+  dealerName: string | null
+  dealerLocation: string | null
+  dealDate: Date
+  financingRate: number | null
+  financingTerm: number | null
+  downPayment: number | null
+  monthlyPayment: number | null
+  notes: string | null
+  isLeased: boolean
+  leaseTermMonths: number | null
+  mileageAllowance: number | null
+  verified: boolean
+  isPublic: boolean
+  createdAt: Date
+  updatedAt: Date
+}
 
 export type CarDealWithRelations = CarDeal & {
-  make: CarMake
-  model: CarModel
-  user: Pick<User, 'id' | 'name' | 'email'>
+  make: Pick<CarMake, 'id' | 'name'>
+  model: Pick<CarModel, 'id' | 'name'>
+  user: UserLite
 }
 
 export type CarModelWithMake = CarModel & {

@@ -6,8 +6,7 @@ import { DealFilters } from '@/components/deal-filters'
 import { DealCard } from '@/components/deal-card'
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
-import { CarDealWithRelations } from '@/types'
-import { CarMake, CarModel } from '@prisma/client'
+import { CarDealWithRelations, CarMake, CarModel } from '@/types'
 
 interface DealsResponse {
   deals: CarDealWithRelations[]

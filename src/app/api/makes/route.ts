@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { sql } from '@/lib/db'
 
 export async function GET() {
   console.log('🚀 GET /api/makes - Request started')
@@ -10,21 +10,43 @@ export async function GET() {
   })
 
   try {
-    console.log('🔍 Testing Prisma connection...')
-    
-    // Test basic database connection first
-    await prisma.$connect()
-    console.log('✅ Prisma connection successful')
+    console.log('📝 Executing SQL query for car makes with counts...')
+    const rows = await sql`
+      select 
+        m.id,
+        m.name,
+        m.logo,
+        m."createdAt" as "createdAt",
+        m."updatedAt" as "updatedAt",
+        coalesce(count(d.id), 0)::int as "carDealsCount"
+      from car_makes m
+      left join car_deals d on d."makeId" = m.id
+      group by m.id, m.name, m.logo, m."createdAt", m."updatedAt"
+      order by m.name asc
+    ` as Array<{
+      id: string
+      name: string
+      logo: string | null
+      createdAt: string
+      updatedAt: string
+      carDealsCount: number
+    }>
 
-    console.log('📝 Executing findMany query for CarMake...')
-    const makes = await prisma.carMake.findMany({
-      orderBy: { name: 'asc' },
-      include: {
-        _count: {
-          select: { carDeals: true }
-        }
-      }
-    })
+    const makes = rows.map((r: {
+      id: string
+      name: string
+      logo: string | null
+      createdAt: string
+      updatedAt: string
+      carDealsCount: number
+    }) => ({
+      id: r.id,
+      name: r.name,
+      logo: r.logo,
+      createdAt: r.createdAt,
+      updatedAt: r.updatedAt,
+      _count: { carDeals: r.carDealsCount },
+    }))
 
     console.log('✅ Query successful, found', makes.length, 'makes')
     console.log('📋 Makes summary:', makes.map(make => ({ 

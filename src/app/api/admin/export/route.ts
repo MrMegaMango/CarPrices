@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { sql } from '@/lib/db'
 
 // This endpoint should be protected and only accessible by admin users
 export async function GET() {
@@ -28,35 +28,17 @@ export async function GET() {
 
     // Export all data
     const [deals, makes, models, users] = await Promise.all([
-      prisma.carDeal.findMany({
-        include: {
-          make: true,
-          model: true,
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              createdAt: true,
-            },
-          },
-        },
-      }),
-      prisma.carMake.findMany(),
-      prisma.carModel.findMany({
-        include: {
-          make: true,
-        },
-      }),
-      prisma.user.findMany({
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      }),
+      (sql`
+        select d.*, ma.name as "make.name", mo.name as "model.name",
+               u.id as "user.id", u.name as "user.name", u.email as "user.email", u."createdAt" as "user.createdAt"
+        from car_deals d
+        join car_makes ma on ma.id = d."makeId"
+        join car_models mo on mo.id = d."modelId"
+        join users u on u.id = d."userId"
+      `) as unknown as Array<Record<string, unknown>>, 
+      (sql`select * from car_makes`) as unknown as Array<Record<string, unknown>>,
+      (sql`select m.*, ma.name as "make.name" from car_models m join car_makes ma on ma.id = m."makeId"`) as unknown as Array<Record<string, unknown>>,
+      (sql`select id, name, email, "createdAt", "updatedAt" from users`) as unknown as Array<Record<string, unknown>>,
     ])
 
     const exportData = {
