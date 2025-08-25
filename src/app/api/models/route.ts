@@ -12,27 +12,46 @@ export async function GET(request: NextRequest) {
     console.log('🔍 Database URL exists:', !!process.env.DATABASE_URL)
 
     console.log('📝 Executing SQL query for car models...')
-    const rows = await sql`
-      select 
-        mo.id,
-        mo.name,
-        mo."makeId" as "makeId",
-        mo."createdAt" as "createdAt",
-        mo."updatedAt" as "updatedAt",
-        coalesce(count(d.id), 0)::int as "carDealsCount",
-        ma.id as "make.id",
-        ma.name as "make.name",
-        ma.logo as "make.logo",
-        ma."createdAt" as "make.createdAt",
-        ma."updatedAt" as "make.updatedAt"
-      from car_models mo
-      join car_makes ma on ma.id = mo."makeId"
-      left join car_deals d on d."modelId" = mo.id
-      where 1=1
-      ${makeId ? sql` and mo."makeId" = ${makeId}` : sql``}
-      group by mo.id, mo.name, mo."makeId", mo."createdAt", mo."updatedAt", ma.id, ma.name, ma.logo, ma."createdAt", ma."updatedAt"
-      order by mo.name asc
-    ` as Array<{
+    const rows = (makeId
+      ? await sql`
+        select 
+          mo.id,
+          mo.name,
+          mo."makeId" as "makeId",
+          mo."createdAt" as "createdAt",
+          mo."updatedAt" as "updatedAt",
+          coalesce(count(d.id), 0)::int as "carDealsCount",
+          ma.id as "make.id",
+          ma.name as "make.name",
+          ma.logo as "make.logo",
+          ma."createdAt" as "make.createdAt",
+          ma."updatedAt" as "make.updatedAt"
+        from car_models mo
+        join car_makes ma on ma.id = mo."makeId"
+        left join car_deals d on d."modelId" = mo.id
+        where mo."makeId" = ${makeId}
+        group by mo.id, mo.name, mo."makeId", mo."createdAt", mo."updatedAt", ma.id, ma.name, ma.logo, ma."createdAt", ma."updatedAt"
+        order by mo.name asc
+      `
+      : await sql`
+        select 
+          mo.id,
+          mo.name,
+          mo."makeId" as "makeId",
+          mo."createdAt" as "createdAt",
+          mo."updatedAt" as "updatedAt",
+          coalesce(count(d.id), 0)::int as "carDealsCount",
+          ma.id as "make.id",
+          ma.name as "make.name",
+          ma.logo as "make.logo",
+          ma."createdAt" as "make.createdAt",
+          ma."updatedAt" as "make.updatedAt"
+        from car_models mo
+        join car_makes ma on ma.id = mo."makeId"
+        left join car_deals d on d."modelId" = mo.id
+        group by mo.id, mo.name, mo."makeId", mo."createdAt", mo."updatedAt", ma.id, ma.name, ma.logo, ma."createdAt", ma."updatedAt"
+        order by mo.name asc
+      `) as Array<{
       id: string
       name: string
       makeId: string
