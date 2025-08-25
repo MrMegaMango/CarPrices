@@ -345,7 +345,7 @@ export default function NewDealPage() {
                               + Add Custom Make
                             </SelectItem>
                             {makes.length === 0 && (
-                              <SelectItem value="" disabled>
+                              <SelectItem value="__loading__" disabled>
                                 Loading makes...
                               </SelectItem>
                             )}
@@ -439,7 +439,7 @@ export default function NewDealPage() {
                               </SelectItem>
                             )}
                             {!selectedMakeId && (
-                              <SelectItem value="" disabled>
+                              <SelectItem value="__select_make_first__" disabled>
                                 Select a make first
                               </SelectItem>
                             )}

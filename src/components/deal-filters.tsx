@@ -99,12 +99,12 @@ export function DealFilters({ makes, models, onFiltersChange }: DealFiltersProps
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="make">Make</Label>
-            <Select value={filters.makeId} onValueChange={(value) => updateFilters({ makeId: value })}>
+            <Select value={filters.makeId} onValueChange={(value) => updateFilters({ makeId: value === '__all__' ? '' : value })}>
               <SelectTrigger>
                 <SelectValue placeholder="Select make" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Makes</SelectItem>
+                <SelectItem value="__all__">All Makes</SelectItem>
                 {makes.map((make) => (
                   <SelectItem key={make.id} value={make.id}>
                     {make.name}
@@ -118,14 +118,14 @@ export function DealFilters({ makes, models, onFiltersChange }: DealFiltersProps
             <Label htmlFor="model">Model</Label>
             <Select 
               value={filters.modelId} 
-              onValueChange={(value) => updateFilters({ modelId: value })}
+              onValueChange={(value) => updateFilters({ modelId: value === '__all__' ? '' : value })}
               disabled={!filters.makeId}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select model" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Models</SelectItem>
+                <SelectItem value="__all__">All Models</SelectItem>
                 {filteredModels.map((model) => (
                   <SelectItem key={model.id} value={model.id}>
                     {model.name}
@@ -137,12 +137,12 @@ export function DealFilters({ makes, models, onFiltersChange }: DealFiltersProps
 
           <div className="space-y-2">
             <Label htmlFor="year">Year</Label>
-            <Select value={filters.year} onValueChange={(value) => updateFilters({ year: value })}>
+            <Select value={filters.year} onValueChange={(value) => updateFilters({ year: value === '__all__' ? '' : value })}>
               <SelectTrigger>
                 <SelectValue placeholder="Select year" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Years</SelectItem>
+                <SelectItem value="__all__">All Years</SelectItem>
                 {years.map((year) => (
                   <SelectItem key={year} value={year.toString()}>
                     {year}
