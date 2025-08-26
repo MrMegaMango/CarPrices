@@ -126,7 +126,30 @@ export default function MyDealsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {deals.map(deal => (
-              <DealCard key={deal.id} deal={deal} />
+              <div key={deal.id} className="space-y-2">
+                <DealCard deal={deal} />
+                <div className="flex justify-end gap-2">
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={`/deals/${deal.id}/edit`}>Edit</Link>
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={async () => {
+                      if (!confirm('Delete this deal? This cannot be undone.')) return
+                      const res = await fetch(`/api/deals/${deal.id}`, { method: 'DELETE' })
+                      if (res.ok) {
+                        setDeals(prev => prev.filter(d => d.id !== deal.id))
+                      } else {
+                        const body = await res.json().catch(() => ({}))
+                        alert(body.error || 'Failed to delete deal')
+                      }
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </div>
             ))}
           </div>
         )}
