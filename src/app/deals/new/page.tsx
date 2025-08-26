@@ -523,7 +523,9 @@ export default function NewDealPage() {
                     name="trim"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Trim (Optional)</FormLabel>
+                        <FormLabel>
+                          Trim <span className="text-muted-foreground">(Optional)</span>
+                        </FormLabel>
                         <FormControl>
                           <Input placeholder="e.g., LX, EX, Sport" className="placeholder:text-muted-foreground" {...field} />
                         </FormControl>
@@ -537,7 +539,9 @@ export default function NewDealPage() {
                     name="exteriorColor"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Exterior Color (Optional)</FormLabel>
+                        <FormLabel>
+                          Exterior Color <span className="text-muted-foreground">(Optional)</span>
+                        </FormLabel>
                         <FormControl>
                           <Input placeholder="e.g., Deep Blue" className="placeholder:text-muted-foreground" {...field} />
                         </FormControl>
@@ -551,7 +555,9 @@ export default function NewDealPage() {
                     name="interiorColor"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Interior Color (Optional)</FormLabel>
+                        <FormLabel>
+                          Interior Color <span className="text-muted-foreground">(Optional)</span>
+                        </FormLabel>
                         <FormControl>
                           <Input placeholder="e.g., Black" className="placeholder:text-muted-foreground" {...field} />
                         </FormControl>
@@ -620,7 +626,9 @@ export default function NewDealPage() {
                     name="otdPrice"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Out-the-Door Price ($) (Optional)</FormLabel>
+                        <FormLabel>
+                          Out-the-Door Price ($) <span className="text-muted-foreground">(Optional)</span>
+                        </FormLabel>
                         <FormControl>
                           <Input 
                             type="text" 
@@ -643,7 +651,9 @@ export default function NewDealPage() {
                     name="rebates"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Rebates/Incentives ($) (Optional)</FormLabel>
+                        <FormLabel>
+                          Rebates/Incentives ($) <span className="text-muted-foreground">(Optional)</span>
+                        </FormLabel>
                         <FormControl>
                           <Input 
                             type="text" 
@@ -665,7 +675,9 @@ export default function NewDealPage() {
                     name="tradeInValue"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Trade-in Value ($) (Optional)</FormLabel>
+                        <FormLabel>
+                          Trade-in Value ($) <span className="text-muted-foreground">(Optional)</span>
+                        </FormLabel>
                         <FormControl>
                           <Input 
                             type="text" 
@@ -712,9 +724,11 @@ export default function NewDealPage() {
                     name="dealerName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Dealer Name (Optional)</FormLabel>
+                        <FormLabel>
+                          Dealer Name <span className="text-muted-foreground">(Optional)</span>
+                        </FormLabel>
                         <FormControl>
-                          <Input placeholder="ABC Honda" {...field} />
+                          <Input placeholder="ABC Honda" className="placeholder:text-muted-foreground" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -726,9 +740,11 @@ export default function NewDealPage() {
                     name="dealerLocation"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Dealer Location (Optional)</FormLabel>
+                        <FormLabel>
+                          Dealer Location <span className="text-muted-foreground">(Optional)</span>
+                        </FormLabel>
                         <FormControl>
-                          <Input placeholder="San Francisco, CA" {...field} />
+                          <Input placeholder="San Francisco, CA" className="placeholder:text-muted-foreground" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -760,7 +776,9 @@ export default function NewDealPage() {
                         name="financingRate"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Financing Rate (%) (Optional)</FormLabel>
+                            <FormLabel>
+                              Financing Rate (%) <span className="text-muted-foreground">(Optional)</span>
+                            </FormLabel>
                             <FormControl>
                               <Input 
                                 type="text" 
@@ -782,7 +800,9 @@ export default function NewDealPage() {
                         name="financingTerm"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Financing Term (months) (Optional)</FormLabel>
+                            <FormLabel>
+                              Financing Term (months) <span className="text-muted-foreground">(Optional)</span>
+                            </FormLabel>
                             <FormControl>
                               <Input 
                                 type="text" 
@@ -804,7 +824,9 @@ export default function NewDealPage() {
                         name="downPayment"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Down Payment ($) (Optional)</FormLabel>
+                            <FormLabel>
+                              Down Payment ($) <span className="text-muted-foreground">(Optional)</span>
+                            </FormLabel>
                             <FormControl>
                               <Input 
                                 type="text" 
@@ -830,7 +852,9 @@ export default function NewDealPage() {
                         name="leaseTermMonths"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Lease Term (months) (Optional)</FormLabel>
+                            <FormLabel>
+                              Lease Term (months) <span className="text-muted-foreground">(Optional)</span>
+                            </FormLabel>
                             <FormControl>
                               <Input 
                                 type="text" 
@@ -852,7 +876,9 @@ export default function NewDealPage() {
                         name="mileageAllowance"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Annual Mileage Allowance (Optional)</FormLabel>
+                            <FormLabel>
+                              Annual Mileage Allowance <span className="text-muted-foreground">(Optional)</span>
+                            </FormLabel>
                             <FormControl>
                               <Input 
                                 type="text" 
@@ -876,7 +902,9 @@ export default function NewDealPage() {
                     name="monthlyPayment"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Monthly Payment ($) (Optional)</FormLabel>
+                        <FormLabel>
+                          Monthly Payment ($) <span className="text-muted-foreground">(Optional)</span>
+                        </FormLabel>
                         <FormControl>
                           <Input 
                             type="text" 
@@ -906,7 +934,9 @@ export default function NewDealPage() {
                     name="notes"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Notes (Optional)</FormLabel>
+                        <FormLabel>
+                          Notes <span className="text-muted-foreground">(Optional)</span>
+                        </FormLabel>
                         <FormControl>
                           <Textarea 
                             placeholder="Share any additional details about your deal, negotiation process, or tips for other buyers..."
