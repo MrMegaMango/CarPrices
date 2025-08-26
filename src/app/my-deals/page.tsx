@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useEffect, useState, useCallback } from 'react'
 import { useSession, signIn } from 'next-auth/react'
 import { Navigation } from '@/components/navigation'
@@ -117,9 +118,9 @@ export default function MyDealsPage() {
           </div>
         ) : deals.length === 0 ? (
           <div className="text-center text-gray-600 py-16">
-            <p className="mb-4">You haven't shared any deals yet.</p>
+            <p className="mb-4">You haven&apos;t shared any deals yet.</p>
             <Button asChild>
-              <a href="/deals/new">Share Your First Report</a>
+              <Link href="/deals/new">Share Your First Report</Link>
             </Button>
           </div>
         ) : (
