@@ -16,6 +16,12 @@ export const authOptions = {
   callbacks: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async signIn({ user, account }: { user: any; account: any }) {
+      console.log('SignIn callback called:', { 
+        provider: account?.provider, 
+        email: user?.email, 
+        providerAccountId: account?.providerAccountId 
+      })
+      
       if (account?.provider === 'google' && user?.email) {
         try {
           // Check if user exists, if not create them
@@ -23,20 +29,24 @@ export const authOptions = {
             select id from users where email = ${user.email} limit 1
           ` as Array<{ id: string }>
 
+          console.log('Existing user check:', existingUser.length > 0 ? 'Found' : 'Not found')
+
           if (existingUser.length === 0) {
             // Create new user
+            console.log('Creating new user with ID:', account.providerAccountId)
             await sql`
-              insert into users (id, email, name, image)
-              values (${account.providerAccountId}, ${user.email}, ${user.name || null}, ${user.image || null})
+              insert into users (id, email, name, image, "updatedAt")
+              values (${account.providerAccountId}, ${user.email}, ${user.name || null}, ${user.image || null}, CURRENT_TIMESTAMP)
               on conflict (email) do update set
                 name = excluded.name,
                 image = excluded.image,
                 "updatedAt" = CURRENT_TIMESTAMP
             `
+            console.log('User created successfully')
           }
           return true
         } catch (error) {
-          console.error('Error creating user:', error)
+          console.error('Error creating user during sign-in:', error)
           return false
         }
       }

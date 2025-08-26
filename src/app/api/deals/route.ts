@@ -138,6 +138,27 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Ensure user exists in database (fallback in case sign-in callback didn't work)
+    const existingUser = await sql`
+      select id from users where id = ${session.user.id} limit 1
+    ` as Array<{ id: string }>
+
+    if (existingUser.length === 0) {
+      // Create user if they don't exist
+      try {
+        await sql`
+          insert into users (id, email, name, image, "updatedAt")
+          values (${session.user.id}, ${session.user.email || ''}, ${session.user.name || null}, ${session.user.image || null}, CURRENT_TIMESTAMP)
+        `
+      } catch (userCreateError) {
+        console.error('Error creating user during deal creation:', userCreateError)
+        return NextResponse.json(
+          { error: 'Failed to create user account' },
+          { status: 500 }
+        )
+      }
+    }
+
     const body = await request.json()
     const validatedData = dealSchema.parse(body)
 
