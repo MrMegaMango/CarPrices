@@ -44,7 +44,7 @@ const dealFormSchema = z.object({
   sellingPrice: z.number().positive('Selling price must be positive'),
   otdPrice: z.number().positive().optional(),
   rebates: z.number().optional(),
-  tradeInValue: z.number().optional(),
+
   dealerName: z.string().optional(),
   dealerLocation: z.string().optional(),
   dealDate: z.string().min(1, 'Please select a deal date'),
@@ -670,29 +670,7 @@ export default function NewDealPage() {
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="tradeInValue"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Trade-in Value ($) <span className="opacity-50">(Optional)</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="text" 
-                            inputMode="decimal"
-                            placeholder="e.g., 8,000" 
-                            className="placeholder:opacity-50"
-                            {...field}
-                            value={field.value ?? ''}
-                            onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+
                 </CardContent>
               </Card>
 
