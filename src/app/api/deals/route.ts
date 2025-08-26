@@ -69,9 +69,39 @@ export async function GET(request: NextRequest) {
       if (maxPrice) where.sellingPrice.lte = parseInt(maxPrice) * 100 // Convert to cents
     }
 
-    // Sorting handled inline in SQL below
+    // Build dynamic SQL safely with positional parameters (no nested template fragments)
+    const conditions: string[] = ['d."isPublic" = true']
+    const params: Array<string | number | Date | null> = []
 
-    const deals = await sql`
+    if (makeId) {
+      params.push(makeId)
+      conditions.push(`d."makeId" = $${params.length}`)
+    }
+    if (modelId) {
+      params.push(modelId)
+      conditions.push(`d."modelId" = $${params.length}`)
+    }
+    if (year) {
+      const yearInt = parseInt(year)
+      params.push(yearInt)
+      conditions.push(`d.year = $${params.length}`)
+    }
+    if (minPrice) {
+      const minCents = parseInt(minPrice) * 100
+      params.push(minCents)
+      conditions.push(`d."sellingPrice" >= $${params.length}`)
+    }
+    if (maxPrice) {
+      const maxCents = parseInt(maxPrice) * 100
+      params.push(maxCents)
+      conditions.push(`d."sellingPrice" <= $${params.length}`)
+    }
+
+    const orderByColumn = sortBy === 'price' ? 'd."sellingPrice"' : 'd."createdAt"'
+    const orderByDirection = sortOrder === 'asc' ? 'asc' : 'desc'
+    const offsetVal = (page - 1) * limit
+
+    const dealsQuery = `
       select 
         d.*,
         ma.name as "make.name",
@@ -83,29 +113,26 @@ export async function GET(request: NextRequest) {
       join car_makes ma on ma.id = d."makeId"
       join car_models mo on mo.id = d."modelId"
       join users u on u.id = d."userId"
-      where d."isPublic" = true
-      ${makeId ? sql` and d."makeId" = ${makeId}` : sql``}
-      ${modelId ? sql` and d."modelId" = ${modelId}` : sql``}
-      ${year ? sql` and d.year = ${parseInt(year)}` : sql``}
-      ${minPrice ? sql` and d."sellingPrice" >= ${parseInt(minPrice) * 100}` : sql``}
-      ${maxPrice ? sql` and d."sellingPrice" <= ${parseInt(maxPrice) * 100}` : sql``}
-      ${sortBy === 'price'
-        ? (sortOrder === 'asc' ? sql`order by d."sellingPrice" asc` : sql`order by d."sellingPrice" desc`)
-        : (sortOrder === 'asc' ? sql`order by d."createdAt" asc` : sql`order by d."createdAt" desc`)}
-      offset ${(page - 1) * limit}
-      limit ${limit}
-    ` as Array<Record<string, unknown>>
+      where ${conditions.join(' and ')}
+      order by ${orderByColumn} ${orderByDirection}
+      offset $${params.length + 1}
+      limit $${params.length + 2}
+    `
 
-    const totalRows = await sql`
+    const deals = await sql(
+      dealsQuery,
+      [...params, offsetVal, limit]
+    ) as Array<Record<string, unknown>>
+
+    const countQuery = `
       select count(*)::int as count
       from car_deals d
-      where d."isPublic" = true
-      ${makeId ? sql` and d."makeId" = ${makeId}` : sql``}
-      ${modelId ? sql` and d."modelId" = ${modelId}` : sql``}
-      ${year ? sql` and d.year = ${parseInt(year)}` : sql``}
-      ${minPrice ? sql` and d."sellingPrice" >= ${parseInt(minPrice) * 100}` : sql``}
-      ${maxPrice ? sql` and d."sellingPrice" <= ${parseInt(maxPrice) * 100}` : sql``}
-    ` as Array<{ count: number }>
+      where ${conditions.join(' and ')}
+    `
+    const totalRows = await sql(
+      countQuery,
+      params
+    ) as Array<{ count: number }>
     const total = totalRows[0]?.count ?? 0
 
     return NextResponse.json({
