@@ -92,7 +92,7 @@ Check it out: ${shareUrl}`
           <span>Share</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
+      <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-neutral-900">
         <DropdownMenuItem onClick={copyToClipboard}>
           {copied ? (
             <Check className="h-4 w-4 mr-2 text-green-600" />
