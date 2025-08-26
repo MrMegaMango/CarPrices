@@ -135,6 +135,7 @@ export default function MyDealsPage() {
                   <Button
                     variant="destructive"
                     size="sm"
+                    className="bg-red-600 hover:bg-red-700 text-white focus-visible:ring-red-500"
                     onClick={async () => {
                       if (!confirm('Delete this deal? This cannot be undone.')) return
                       const res = await fetch(`/api/deals/${deal.id}`, { method: 'DELETE' })
