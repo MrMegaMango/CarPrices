@@ -18,6 +18,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "CarDeals - Crowdsourced Car Price Reports",
   description: "Share and discover real car price reports, MSRP, selling prices, and out-the-door costs from actual buyers.",
+  verification: {
+    google: "KBj_D2jXBXNKcym9v6b_vIeUM_FXV4FU3CwECxDSITM",
+  },
 };
 
 export default function RootLayout({
