@@ -110,7 +110,7 @@ export default function StatisticsPage() {
             Market Statistics
           </h1>
           <p className="text-gray-600">
-            Place holder for now. But will be 
+            Place holder for now. But will be:  <br />
             Real-time insights from crowdsourced car deal data
           </p>
         </div>
