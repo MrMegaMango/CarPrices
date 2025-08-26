@@ -10,7 +10,7 @@ export default function TermsPage() {
 
         <section className="space-y-4">
           <p>
-            These Terms of Service ("Terms") govern your access to and use of CarDeals. By accessing or using the service, you agree to be bound by these Terms.
+            These Terms of Service (&quot;Terms&quot;) govern your access to and use of CarDeals. By accessing or using the service, you agree to be bound by these Terms.
           </p>
 
           <h2 className="text-xl font-semibold mt-6">1. Acceptance of Terms</h2>
@@ -25,7 +25,7 @@ export default function TermsPage() {
 
           <h2 className="text-xl font-semibold mt-6">3. User Content</h2>
           <p>
-            You may submit vehicle price reports and related information ("Content"). You retain ownership of your Content. By submitting Content, you grant CarDeals a non-exclusive, worldwide, royalty-free license to host, store, display, and share the Content for the purpose of operating and improving the service.
+            You may submit vehicle price reports and related information (&quot;Content&quot;). You retain ownership of your Content. By submitting Content, you grant CarDeals a non-exclusive, worldwide, royalty-free license to host, store, display, and share the Content for the purpose of operating and improving the service.
           </p>
 
           <h2 className="text-xl font-semibold mt-6">4. Prohibited Conduct</h2>
@@ -40,7 +40,7 @@ export default function TermsPage() {
 
           <h2 className="text-xl font-semibold mt-6">6. Disclaimer of Warranties</h2>
           <p>
-            The service is provided "as is" and "as available" without warranties of any kind, whether express or implied, including but not limited to implied warranties of merchantability, fitness for a particular purpose, and non-infringement.
+            The service is provided &quot;as is&quot; and &quot;as available&quot; without warranties of any kind, whether express or implied, including but not limited to implied warranties of merchantability, fitness for a particular purpose, and non-infringement.
           </p>
 
           <h2 className="text-xl font-semibold mt-6">7. Limitation of Liability</h2>
