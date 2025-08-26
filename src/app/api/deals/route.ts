@@ -5,6 +5,7 @@ import { sql } from '@/lib/db'
 import { ensureCarDealsColorColumns } from '@/lib/db-migrate'
 import { authOptions } from '@/lib/auth'
 import { z } from 'zod'
+import { randomBytes } from 'crypto'
 
 const dealSchema = z.object({
   makeId: z.string(),
@@ -140,8 +141,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const validatedData = dealSchema.parse(body)
 
+    // Generate unique ID
+    const id = randomBytes(16).toString('hex')
+    
     // Convert dollar amounts to cents
     const dealData = {
+      id,
       ...validatedData,
       msrp: Math.round(validatedData.msrp * 100),
       sellingPrice: Math.round(validatedData.sellingPrice * 100),
@@ -157,17 +162,17 @@ export async function POST(request: NextRequest) {
 
     const inserted = await sql`
       insert into car_deals (
-        "userId", "makeId", "modelId", year, trim, color, "exteriorColor", "interiorColor",
+        id, "userId", "makeId", "modelId", year, trim, color, "exteriorColor", "interiorColor",
         msrp, "sellingPrice", "otdPrice", rebates,
         "dealerName", "dealerLocation", "dealDate", "financingRate",
         "financingTerm", "downPayment", "monthlyPayment", notes, "isLeased",
-        "leaseTermMonths", "mileageAllowance", verified, "isPublic"
+        "leaseTermMonths", "mileageAllowance", verified, "isPublic", "updatedAt"
       ) values (
-        ${dealData.userId}, ${dealData.makeId}, ${dealData.modelId}, ${dealData.year}, ${dealData.trim ?? null}, ${dealData.color ?? null}, ${dealData.exteriorColor ?? null}, ${dealData.interiorColor ?? null},
+        ${dealData.id}, ${dealData.userId}, ${dealData.makeId}, ${dealData.modelId}, ${dealData.year}, ${dealData.trim ?? null}, ${dealData.color ?? null}, ${dealData.exteriorColor ?? null}, ${dealData.interiorColor ?? null},
         ${dealData.msrp}, ${dealData.sellingPrice}, ${dealData.otdPrice ?? null}, ${dealData.rebates ?? null},
         ${dealData.dealerName ?? null}, ${dealData.dealerLocation ?? null}, ${dealData.dealDate}, ${dealData.financingRate ?? null},
         ${dealData.financingTerm ?? null}, ${dealData.downPayment ?? null}, ${dealData.monthlyPayment ?? null}, ${dealData.notes ?? null}, ${dealData.isLeased},
-        ${dealData.leaseTermMonths ?? null}, ${dealData.mileageAllowance ?? null}, false, true
+        ${dealData.leaseTermMonths ?? null}, ${dealData.mileageAllowance ?? null}, false, true, CURRENT_TIMESTAMP
       )
       returning *
     ` as Array<Record<string, unknown>>
