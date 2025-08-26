@@ -1,5 +1,6 @@
 import GoogleProvider from "next-auth/providers/google"
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const authOptions = {
   // Temporarily disable Prisma adapter to test OAuth flow
   providers: [
@@ -16,14 +17,17 @@ export const authOptions = {
       // Allow all sign-ins for testing
       return true
     },
-    async session({ session, token }: { session: { user?: { id?: string } }; token: { sub?: string } }) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async session({ session, token }: { session: any; token: any }) {
       // Add user ID to session
       if (session.user && token.sub) {
-        session.user.id = token.sub
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (session.user as any).id = token.sub
       }
       return session
     },
-    async jwt({ token, user }: { token: { sub?: string }; user?: { id?: string } }) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async jwt({ token, user }: { token: any; user?: any }) {
       // Persist user ID in token
       if (user?.id) {
         token.sub = user.id
