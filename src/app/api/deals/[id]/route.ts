@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { sql } from '@/lib/db'
 import { getServerSession } from 'next-auth'
+import type { Session } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { z } from 'zod'
 
@@ -72,8 +73,10 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session || !(session as any).user?.id) {
+    const session = await getServerSession(authOptions) as Session | null
+    type SessionWithUserId = Session & { user: NonNullable<Session['user']> & { id: string } }
+    const userId = (session as SessionWithUserId | null)?.user?.id
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
     const { id } = await params
@@ -84,7 +87,7 @@ export async function PUT(
     if (!rows[0]) {
       return NextResponse.json({ error: 'Deal not found' }, { status: 404 })
     }
-    if (rows[0].userId !== (session as any).user.id) {
+    if (rows[0].userId !== userId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
@@ -139,8 +142,10 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session || !(session as any).user?.id) {
+    const session = await getServerSession(authOptions) as Session | null
+    type SessionWithUserId = Session & { user: NonNullable<Session['user']> & { id: string } }
+    const userId = (session as SessionWithUserId | null)?.user?.id
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
     const { id } = await params
@@ -148,7 +153,7 @@ export async function DELETE(
     if (!rows[0]) {
       return NextResponse.json({ error: 'Deal not found' }, { status: 404 })
     }
-    if (rows[0].userId !== (session as any).user.id) {
+    if (rows[0].userId !== userId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
