@@ -16,16 +16,16 @@ export const authOptions = {
       // Allow all sign-ins for testing
       return true
     },
-    async session({ session, token }: { session: any; token: any }) {
+    async session({ session, token }: { session: { user?: { id?: string } }; token: { sub?: string } }) {
       // Add user ID to session
       if (session.user && token.sub) {
         session.user.id = token.sub
       }
       return session
     },
-    async jwt({ token, user }: { token: any; user?: any }) {
+    async jwt({ token, user }: { token: { sub?: string }; user?: { id?: string } }) {
       // Persist user ID in token
-      if (user) {
+      if (user?.id) {
         token.sub = user.id
       }
       return token
