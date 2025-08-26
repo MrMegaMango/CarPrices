@@ -18,7 +18,7 @@ const dealSchema = z.object({
   sellingPrice: z.number().positive(),
   otdPrice: z.number().positive().optional(),
   rebates: z.number().optional(),
-  tradeInValue: z.number().optional(),
+
   dealerName: z.string().optional(),
   dealerLocation: z.string().optional(),
   dealDate: z.string().transform((str) => new Date(str)),
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
       sellingPrice: Math.round(validatedData.sellingPrice * 100),
       otdPrice: validatedData.otdPrice ? Math.round(validatedData.otdPrice * 100) : null,
       rebates: validatedData.rebates ? Math.round(validatedData.rebates * 100) : null,
-      tradeInValue: validatedData.tradeInValue ? Math.round(validatedData.tradeInValue * 100) : null,
+
       downPayment: validatedData.downPayment ? Math.round(validatedData.downPayment * 100) : null,
       monthlyPayment: validatedData.monthlyPayment ? Math.round(validatedData.monthlyPayment * 100) : null,
       userId: session.user.id,
@@ -158,13 +158,13 @@ export async function POST(request: NextRequest) {
     const inserted = await sql`
       insert into car_deals (
         "userId", "makeId", "modelId", year, trim, color, "exteriorColor", "interiorColor",
-        msrp, "sellingPrice", "otdPrice", rebates, "tradeInValue",
+        msrp, "sellingPrice", "otdPrice", rebates,
         "dealerName", "dealerLocation", "dealDate", "financingRate",
         "financingTerm", "downPayment", "monthlyPayment", notes, "isLeased",
         "leaseTermMonths", "mileageAllowance", verified, "isPublic"
       ) values (
         ${dealData.userId}, ${dealData.makeId}, ${dealData.modelId}, ${dealData.year}, ${dealData.trim ?? null}, ${dealData.color ?? null}, ${dealData.exteriorColor ?? null}, ${dealData.interiorColor ?? null},
-        ${dealData.msrp}, ${dealData.sellingPrice}, ${dealData.otdPrice ?? null}, ${dealData.rebates ?? null}, ${dealData.tradeInValue ?? null},
+        ${dealData.msrp}, ${dealData.sellingPrice}, ${dealData.otdPrice ?? null}, ${dealData.rebates ?? null},
         ${dealData.dealerName ?? null}, ${dealData.dealerLocation ?? null}, ${dealData.dealDate}, ${dealData.financingRate ?? null},
         ${dealData.financingTerm ?? null}, ${dealData.downPayment ?? null}, ${dealData.monthlyPayment ?? null}, ${dealData.notes ?? null}, ${dealData.isLeased},
         ${dealData.leaseTermMonths ?? null}, ${dealData.mileageAllowance ?? null}, false, true

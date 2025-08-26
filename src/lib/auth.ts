@@ -16,6 +16,20 @@ export const authOptions = {
       // Allow all sign-ins for testing
       return true
     },
+    async session({ session, token }) {
+      // Add user ID to session
+      if (session.user && token.sub) {
+        session.user.id = token.sub
+      }
+      return session
+    },
+    async jwt({ token, user }) {
+      // Persist user ID in token
+      if (user) {
+        token.sub = user.id
+      }
+      return token
+    },
   },
   debug: process.env.NODE_ENV === 'development',
 }
