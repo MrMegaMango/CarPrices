@@ -111,28 +111,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="container mx-auto px-4 py-16">
-        <Card className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-          <CardContent className="text-center py-12">
-            <h2 className="text-3xl font-bold mb-4">
-              Ready to Find Your Best Car Deal?
-            </h2>
-            <p className="text-blue-100 mb-8 max-w-2xl mx-auto">
-              Join thousands of smart car buyers who use CarDeals to research 
-              and share real pricing information.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" variant="secondary">
-                <Link href="/deals">Browse Reports</Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-blue-600">
-                <Link href="/statistics">View Statistics</Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </section>
+
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
