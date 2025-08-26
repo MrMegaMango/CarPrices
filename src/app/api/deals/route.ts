@@ -104,11 +104,9 @@ export async function GET(request: NextRequest) {
     const dealsQuery = `
       select 
         d.*,
-        ma.name as "make.name",
-        mo.name as "model.name",
-        u.id as "user.id",
-        u.name as "user.name",
-        u.email as "user.email"
+        json_build_object('id', ma.id, 'name', ma.name) as make,
+        json_build_object('id', mo.id, 'name', mo.name) as model,
+        json_build_object('id', u.id, 'name', u.name, 'email', u.email) as user
       from car_deals d
       join car_makes ma on ma.id = d."makeId"
       join car_models mo on mo.id = d."modelId"
