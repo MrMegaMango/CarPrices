@@ -12,6 +12,9 @@ export const authOptions = {
       : []
     ),
   ],
+  pages: {
+    signIn: '/signin',
+  },
   callbacks: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async signIn({ user, account }: { user: any; account: any }) {

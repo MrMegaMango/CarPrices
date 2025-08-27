@@ -302,7 +302,7 @@ export default function NewDealPage() {
             </div>
             {!session && (
               <div className="mt-4 flex flex-wrap gap-2">
-                <Button onClick={() => router.push('/api/auth/signin')}>
+                <Button onClick={() => router.push('/signin')}>
                   Sign in (optional)
                 </Button>
                 <Button variant="outline" onClick={() => { /* guest continues with the form */ }}>

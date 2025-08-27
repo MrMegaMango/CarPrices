@@ -64,7 +64,7 @@ export default function EditDealPage() {
   }
 
   if (!session) {
-    router.push('/api/auth/signin')
+    router.push(`/signin?callbackUrl=/deals/${params.id}/edit`)
     return null
   }
 
