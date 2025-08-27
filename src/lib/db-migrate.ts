@@ -11,3 +11,14 @@ export async function ensureCarDealsColorColumns(): Promise<void> {
 }
 
 
+// Ensure columns for anonymous/guest attribution exist
+export async function ensureCarDealsGuestColumns(): Promise<void> {
+  await sql`
+    alter table car_deals add column if not exists "guestId" text;
+  `
+  await sql`
+    alter table car_deals add column if not exists "guestIpHash" text;
+  `
+}
+
+

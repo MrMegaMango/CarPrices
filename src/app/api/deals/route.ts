@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { Session } from 'next-auth'
 import { sql } from '@/lib/db'
-import { ensureCarDealsColorColumns } from '@/lib/db-migrate'
+import { ensureCarDealsColorColumns, ensureCarDealsGuestColumns } from '@/lib/db-migrate'
 import { authOptions } from '@/lib/auth'
 import { z } from 'zod'
-import { randomBytes } from 'crypto'
+import { randomBytes, createHash } from 'crypto'
 
 const dealSchema = z.object({
   makeId: z.string(),
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
       from car_deals d
       join car_makes ma on ma.id = d."makeId"
       join car_models mo on mo.id = d."modelId"
-      join users u on u.id = d."userId"
+      left join users u on u.id = d."userId"
       where ${conditions.join(' and ')}
       order by ${orderByColumn} ${orderByDirection}
       offset $${params.length + 1}
@@ -154,33 +154,67 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     await ensureCarDealsColorColumns()
-    const session = await getServerSession(authOptions) as Session & { user: { id: string } } | null
-    
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
+    await ensureCarDealsGuestColumns()
+    const session = await getServerSession(authOptions) as Session & { user: { id: string; email?: string | null; name?: string | null; image?: string | null } } | null
+
+    // Determine userId: signed-in user or fallback to a shared guest user
+    let userId: string | null = null
+    if (session?.user?.id) {
+      userId = session.user.id
+    } else {
+      userId = 'guest'
     }
 
-    // Ensure user exists in database (fallback in case sign-in callback didn't work)
-    const existingUser = await sql`
-      select id from users where id = ${session.user.id} limit 1
-    ` as Array<{ id: string }>
+    // Build guest identifiers: device cookie (guestId) and IP hash (guestIpHash)
+    let guestId: string | null = null
+    try {
+      // Read cookie if provided via headers (NextRequest cookies())
+      const cookieHeader = request.headers.get('cookie') || ''
+      const match = cookieHeader.match(/cd_anon_id=([^;]+)/)
+      guestId = match ? decodeURIComponent(match[1]) : null
+    } catch {
+      guestId = null
+    }
 
-    if (existingUser.length === 0) {
-      // Create user if they don't exist
+    if (!guestId) {
+      guestId = randomBytes(16).toString('hex')
+    }
+
+    // Derive IP: trust x-forwarded-for or x-real-ip headers
+    const ipHeader = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || ''
+    const ip = ipHeader.split(',')[0]?.trim()
+    const guestIpHash = ip ? createHash('sha256').update(ip).digest('hex') : null
+
+    // Ensure user exists in database (for signed-in users) or ensure a shared 'guest' user exists
+    if (userId !== 'guest') {
+      const existingUser = await sql`
+        select id from users where id = ${userId} limit 1
+      ` as Array<{ id: string }>
+
+      if (existingUser.length === 0) {
+        try {
+          await sql`
+            insert into users (id, email, name, image, "updatedAt")
+            values (${userId}, ${session?.user?.email || null}, ${session?.user?.name || null}, ${session?.user?.image || null}, CURRENT_TIMESTAMP)
+          `
+        } catch (userCreateError) {
+          console.error('Error creating user during deal creation:', userCreateError)
+          return NextResponse.json(
+            { error: 'Failed to create user account' },
+            { status: 500 }
+          )
+        }
+      }
+    } else {
       try {
         await sql`
           insert into users (id, email, name, image, "updatedAt")
-          values (${session.user.id}, ${session.user.email || ''}, ${session.user.name || null}, ${session.user.image || null}, CURRENT_TIMESTAMP)
+          values ('guest', ${null}, 'Guest', ${null}, CURRENT_TIMESTAMP)
+          on conflict (id) do nothing
         `
-      } catch (userCreateError) {
-        console.error('Error creating user during deal creation:', userCreateError)
-        return NextResponse.json(
-          { error: 'Failed to create user account' },
-          { status: 500 }
-        )
+      } catch (guestUserError) {
+        console.error('Error ensuring guest user exists:', guestUserError)
+        // Continue even if guest user creation fails due to race; insert will fail later if FK requires it
       }
     }
 
@@ -201,7 +235,7 @@ export async function POST(request: NextRequest) {
 
       downPayment: validatedData.downPayment ? Math.round(validatedData.downPayment * 100) : null,
       monthlyPayment: validatedData.monthlyPayment ? Math.round(validatedData.monthlyPayment * 100) : null,
-      userId: session.user.id,
+      userId: userId,
       exteriorColor: validatedData.exteriorColor ?? validatedData.color ?? null,
       interiorColor: validatedData.interiorColor ?? null,
     }
@@ -212,13 +246,13 @@ export async function POST(request: NextRequest) {
         msrp, "sellingPrice", "otdPrice", rebates,
         "dealerName", "dealerLocation", "dealDate", "financingRate",
         "financingTerm", "downPayment", "monthlyPayment", notes, "isLeased",
-        "leaseTermMonths", "mileageAllowance", verified, "isPublic", "updatedAt"
+        "leaseTermMonths", "mileageAllowance", verified, "isPublic", "guestId", "guestIpHash", "updatedAt"
       ) values (
         ${dealData.id}, ${dealData.userId}, ${dealData.makeId}, ${dealData.modelId}, ${dealData.year}, ${dealData.trim ?? null}, ${dealData.color ?? null}, ${dealData.exteriorColor ?? null}, ${dealData.interiorColor ?? null},
         ${dealData.msrp}, ${dealData.sellingPrice}, ${dealData.otdPrice ?? null}, ${dealData.rebates ?? null},
         ${dealData.dealerName ?? null}, ${dealData.dealerLocation ?? null}, ${dealData.dealDate}, ${dealData.financingRate ?? null},
         ${dealData.financingTerm ?? null}, ${dealData.downPayment ?? null}, ${dealData.monthlyPayment ?? null}, ${dealData.notes ?? null}, ${dealData.isLeased},
-        ${dealData.leaseTermMonths ?? null}, ${dealData.mileageAllowance ?? null}, false, true, CURRENT_TIMESTAMP
+        ${dealData.leaseTermMonths ?? null}, ${dealData.mileageAllowance ?? null}, false, true, ${guestId}, ${guestIpHash}, CURRENT_TIMESTAMP
       )
       returning *
     ` as Array<Record<string, unknown>>
@@ -235,7 +269,13 @@ export async function POST(request: NextRequest) {
       user: userRow[0],
     }
 
-    return NextResponse.json(deal, { status: 201 })
+    // If we minted a new anon cookie, set it in response for future submissions
+    const response = NextResponse.json(deal, { status: 201 })
+    const hadCookie = request.headers.get('cookie')?.includes('cd_anon_id=')
+    if (!hadCookie) {
+      response.headers.append('Set-Cookie', `cd_anon_id=${encodeURIComponent(guestId)}; Path=/; Max-Age=${60 * 60 * 24 * 365}; SameSite=Lax`)
+    }
+    return response
   } catch (error) {
     console.error('Error creating deal:', error)
     

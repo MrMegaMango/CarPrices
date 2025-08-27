@@ -246,10 +246,7 @@ export default function NewDealPage() {
     )
   }
 
-  if (!session) {
-    router.push('/api/auth/signin')
-    return null
-  }
+  // Remove hard sign-in gate; allow guests to continue
 
   const onSubmit = async (data: DealFormData) => {
     setIsSubmitting(true)
@@ -295,6 +292,24 @@ export default function NewDealPage() {
             <p className="text-gray-600">
               Help others by sharing your car buying experience and pricing details
             </p>
+            <div className="mt-4 rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900">
+              <p className="mb-2">
+                You can submit <span className="font-medium">as a guest</span> — no personal information required.
+              </p>
+              <p>
+                If you sign in, your account is used only to let you <span className="font-medium">manage your own submissions</span>. We do not collect or sell personal data.
+              </p>
+            </div>
+            {!session && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Button onClick={() => router.push('/api/auth/signin')}>
+                  Sign in (optional)
+                </Button>
+                <Button variant="outline" onClick={() => { /* guest continues with the form */ }}>
+                  Continue as guest
+                </Button>
+              </div>
+            )}
           </div>
 
           <Form {...form}>
