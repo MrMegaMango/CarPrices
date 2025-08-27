@@ -61,8 +61,8 @@ export async function POST(request: NextRequest) {
     await ensureCarDealsGuestColumns()
     await sql`
       insert into users (id, email, name, image, "updatedAt")
-      values ('guest', ${null}, 'Guest', ${null}, CURRENT_TIMESTAMP)
-      on conflict (id) do nothing
+      values ('guest', ${'guest@anon.local'}, 'Guest', ${null}, CURRENT_TIMESTAMP)
+      on conflict (id) do update set "updatedAt" = EXCLUDED."updatedAt"
     `
 
     const samples: SampleSpec[] = [

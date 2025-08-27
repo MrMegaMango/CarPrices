@@ -195,7 +195,12 @@ export async function POST(request: NextRequest) {
         try {
           await sql`
             insert into users (id, email, name, image, "updatedAt")
-            values (${userId}, ${session?.user?.email || null}, ${session?.user?.name || null}, ${session?.user?.image || null}, CURRENT_TIMESTAMP)
+            values (${userId}, ${session?.user?.email || 'guest@anon.local'}, ${session?.user?.name || null}, ${session?.user?.image || null}, CURRENT_TIMESTAMP)
+            on conflict (id) do update set
+              email = coalesce(excluded.email, users.email),
+              name = coalesce(excluded.name, users.name),
+              image = coalesce(excluded.image, users.image),
+              "updatedAt" = CURRENT_TIMESTAMP
           `
         } catch (userCreateError) {
           console.error('Error creating user during deal creation:', userCreateError)
@@ -209,8 +214,8 @@ export async function POST(request: NextRequest) {
       try {
         await sql`
           insert into users (id, email, name, image, "updatedAt")
-          values ('guest', ${null}, 'Guest', ${null}, CURRENT_TIMESTAMP)
-          on conflict (id) do nothing
+          values ('guest', ${'guest@anon.local'}, 'Guest', ${null}, CURRENT_TIMESTAMP)
+          on conflict (id) do update set "updatedAt" = EXCLUDED."updatedAt"
         `
       } catch (guestUserError) {
         console.error('Error ensuring guest user exists:', guestUserError)
