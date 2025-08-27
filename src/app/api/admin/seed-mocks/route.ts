@@ -32,7 +32,9 @@ async function findOrCreateMake(name: string): Promise<{ id: string; name: strin
   if (existing.length > 0) return existing[0]
   const newId = randomBytes(16).toString('hex')
   const inserted = await sql`
-    insert into car_makes (id, name) values (${newId}, ${name}) returning id, name
+    insert into car_makes (id, name, "createdAt", "updatedAt")
+    values (${newId}, ${name}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    returning id, name
   ` as Array<{ id: string; name: string }>
   return inserted[0]
 }
@@ -44,7 +46,9 @@ async function findOrCreateModel(makeId: string, name: string): Promise<{ id: st
   if (existing.length > 0) return existing[0]
   const newId = randomBytes(16).toString('hex')
   const inserted = await sql`
-    insert into car_models (id, name, "makeId") values (${newId}, ${name}, ${makeId}) returning id, name
+    insert into car_models (id, name, "makeId", "createdAt", "updatedAt")
+    values (${newId}, ${name}, ${makeId}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    returning id, name
   ` as Array<{ id: string; name: string }>
   return inserted[0]
 }
