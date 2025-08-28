@@ -21,10 +21,10 @@ export default function Home() {
             and out-the-door costs to make informed decisions on your next vehicle.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" className="text-lg px-8">
+            <Button asChild size="lg" className="text-lg px-8 font-semibold shadow-md hover:shadow-lg transition-shadow focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
               <Link href="/deals">Browse Reports</Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="text-lg px-8">
+            <Button asChild variant="outline" size="lg" className="text-lg px-8 font-semibold border-2 border-blue-600 text-blue-700 hover:bg-blue-50 shadow-md hover:shadow-lg transition-shadow focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
               <Link href="/deals/new">Share Your Report</Link>
             </Button>
           </div>
