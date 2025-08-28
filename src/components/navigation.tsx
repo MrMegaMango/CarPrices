@@ -26,7 +26,7 @@ export function Navigation() {
         <div className="flex items-center space-x-6">
           <Link
             href="/deals"
-            className="text-sm font-medium transition-colors hover:text-blue-600"
+            className="text-sm font-semibold text-blue-700 transition-colors hover:text-blue-800 px-2 py-1 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           >
             Browse Reports
           </Link>
