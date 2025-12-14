@@ -156,6 +156,16 @@ The application uses the following main entities:
 
 This project is licensed under the MIT License.
 
+## TODO - User Acquisition
+
+**CRITICAL: Need real users to submit car deal data**
+- Find recent car buyers (within last 6 months)
+- Personally reach out and ask them to submit their deal information
+- Target sources: car forums, Reddit car subreddits, Facebook car groups, local dealership customers
+- **Market with car influencers** - reach out to automotive YouTubers, Instagram car accounts, TikTok car content creators
+- Offer incentives for early adopters who submit verified deals
+- Need at least 50-100 real deals to make the platform valuable
+
 ## Support
 
 For questions or support, please open an issue on GitHub.
