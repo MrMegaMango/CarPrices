@@ -24,6 +24,7 @@ interface StatData {
   topMakes: Array<{ name: string; count: number }>
   avgPriceByYear: Array<{ year: number; avgPrice: number }>
   savingsDistribution: Array<{ range: string; count: number }>
+  activeUsers?: number
 }
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8']
@@ -33,37 +34,41 @@ export default function StatisticsPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // In a real app, this would fetch from /api/statistics
-    // For now, we'll use mock data
-    setTimeout(() => {
-      setStats({
-        totalDeals: 1247,
-        totalSavings: 2847592,
-        avgSavings: 2284,
-        topMakes: [
-          { name: 'Toyota', count: 234 },
-          { name: 'Honda', count: 198 },
-          { name: 'Ford', count: 156 },
-          { name: 'Chevrolet', count: 143 },
-          { name: 'Nissan', count: 127 },
-        ],
-        avgPriceByYear: [
-          { year: 2024, avgPrice: 42500 },
-          { year: 2023, avgPrice: 39800 },
-          { year: 2022, avgPrice: 37200 },
-          { year: 2021, avgPrice: 35600 },
-          { year: 2020, avgPrice: 33900 },
-        ],
-        savingsDistribution: [
-          { range: '$0-$1,000', count: 156 },
-          { range: '$1,000-$3,000', count: 298 },
-          { range: '$3,000-$5,000', count: 234 },
-          { range: '$5,000-$10,000', count: 187 },
-          { range: '$10,000+', count: 89 },
-        ]
-      })
-      setLoading(false)
-    }, 1000)
+    async function fetchStats() {
+      try {
+        const res = await fetch('/api/statistics')
+        if (!res.ok) {
+          throw new Error('Failed to fetch statistics')
+        }
+        const data = await res.json()
+
+        setStats({
+          totalDeals: data.totalDeals || 0,
+          totalSavings: data.totalSavings || 0,
+          avgSavings: data.avgSavings || 0,
+          topMakes: data.topMakes || [],
+          avgPriceByYear: data.avgPriceByYear || [],
+          savingsDistribution: data.savingsDistribution || [],
+          activeUsers: data.activeUsers || 0,
+        })
+      } catch (error) {
+        console.error('Error fetching statistics:', error)
+        // Set default empty data on error
+        setStats({
+          totalDeals: 0,
+          totalSavings: 0,
+          avgSavings: 0,
+          topMakes: [],
+          avgPriceByYear: [],
+          savingsDistribution: [],
+          activeUsers: 0,
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchStats()
   }, [])
 
   const formatCurrency = (amount: number) => {
@@ -168,7 +173,9 @@ export default function StatisticsPage() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">2,847</div>
+              <div className="text-2xl font-bold">
+                {stats.activeUsers?.toLocaleString() || '0'}
+              </div>
               <p className="text-xs text-muted-foreground">
                 Contributors
               </p>

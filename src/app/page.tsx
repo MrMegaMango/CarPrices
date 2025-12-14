@@ -3,8 +3,61 @@ import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Navigation } from '@/components/navigation'
 import { Car, TrendingDown, Users, Search } from 'lucide-react'
+import { sql } from '@/lib/db'
 
-export default function Home() {
+async function getStatistics() {
+  try {
+    // Get total deals count
+    const totalDealsResult = await sql`
+      select count(*)::int as count
+      from car_deals
+      where "isPublic" = true
+    ` as Array<{ count: number }>
+    const totalDeals = totalDealsResult[0]?.count ?? 0
+
+    // Get total savings
+    const totalSavingsResult = await sql`
+      select coalesce(sum(msrp - "sellingPrice"), 0)::bigint as total
+      from car_deals
+      where "isPublic" = true and msrp > "sellingPrice"
+    ` as Array<{ total: string }>
+    const totalSavings = parseInt(totalSavingsResult[0]?.total ?? '0') / 100
+
+    // Get count of unique makes
+    const uniqueMakesResult = await sql`
+      select count(distinct "makeId")::int as count
+      from car_deals
+      where "isPublic" = true
+    ` as Array<{ count: number }>
+    const uniqueMakes = uniqueMakesResult[0]?.count ?? 0
+
+    // Get count of unique states
+    const uniqueStatesResult = await sql`
+      select count(distinct "dealerLocation")::int as count
+      from car_deals
+      where "isPublic" = true and "dealerLocation" is not null
+    ` as Array<{ count: number }>
+    const uniqueStates = uniqueStatesResult[0]?.count ?? 0
+
+    return {
+      totalDeals,
+      totalSavings: Math.round(totalSavings),
+      uniqueMakes,
+      uniqueStates,
+    }
+  } catch (error) {
+    console.error('Error loading statistics:', error)
+    return {
+      totalDeals: 0,
+      totalSavings: 0,
+      uniqueMakes: 0,
+      uniqueStates: 0,
+    }
+  }
+}
+
+export default async function Home() {
+  const stats = await getStatistics()
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <Navigation />
@@ -92,19 +145,27 @@ export default function Home() {
           
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-3xl font-bold text-blue-600 mb-2">10,000+</div>
+              <div className="text-3xl font-bold text-blue-600 mb-2">
+                {stats.totalDeals > 0 ? stats.totalDeals.toLocaleString() : '0'}
+              </div>
               <div className="text-gray-600">Price Reports Shared</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-green-600 mb-2">$2.5M+</div>
+              <div className="text-3xl font-bold text-green-600 mb-2">
+                {stats.totalSavings > 0 ? `$${(stats.totalSavings / 1000000).toFixed(1)}M` : '$0'}
+              </div>
               <div className="text-gray-600">Total Savings Tracked</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-purple-600 mb-2">150+</div>
+              <div className="text-3xl font-bold text-purple-600 mb-2">
+                {stats.uniqueMakes > 0 ? `${stats.uniqueMakes}+` : '0'}
+              </div>
               <div className="text-gray-600">Car Makes & Models</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-orange-600 mb-2">50</div>
+              <div className="text-3xl font-bold text-orange-600 mb-2">
+                {stats.uniqueStates > 0 ? stats.uniqueStates : '0'}
+              </div>
               <div className="text-gray-600">States Covered</div>
             </div>
           </div>
