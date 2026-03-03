@@ -60,7 +60,7 @@ export default function DealsPage() {
     }
   }
 
-  const fetchDeals = useCallback(async (reset = false) => {
+  const fetchDeals = useCallback(async (reset = false, pageOverride?: number) => {
     try {
       if (reset) {
         setLoading(true)
@@ -69,8 +69,9 @@ export default function DealsPage() {
         setLoadingMore(true)
       }
 
+      const currentPage = pageOverride ?? (reset ? 1 : pagination.page)
       const params = new URLSearchParams({
-        page: reset ? '1' : pagination.page.toString(),
+        page: currentPage.toString(),
         limit: pagination.limit.toString(),
         ...filters,
       })
@@ -107,8 +108,9 @@ export default function DealsPage() {
 
   const loadMore = () => {
     if (pagination.page < pagination.pages) {
-      setPagination(prev => ({ ...prev, page: prev.page + 1 }))
-      fetchDeals()
+      const nextPage = pagination.page + 1
+      setPagination(prev => ({ ...prev, page: nextPage }))
+      fetchDeals(false, nextPage)
     }
   }
 
