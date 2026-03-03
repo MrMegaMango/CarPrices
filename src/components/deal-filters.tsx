@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Filter, X } from 'lucide-react'
+import { Filter, X, Search } from 'lucide-react'
 import { CarMake, CarModel } from '@/types'
 
 interface DealFiltersProps {
@@ -35,6 +35,18 @@ export function DealFilters({ makes, models, onFiltersChange }: DealFiltersProps
     sortBy: searchParams.get('sortBy') || 'date',
     sortOrder: searchParams.get('sortOrder') || 'desc',
   })
+
+  // Local price state — only committed on Apply or Enter
+  const [localMinPrice, setLocalMinPrice] = useState(filters.minPrice)
+  const [localMaxPrice, setLocalMaxPrice] = useState(filters.maxPrice)
+
+  const applyPriceFilters = useCallback(() => {
+    updateFilters({ minPrice: localMinPrice, maxPrice: localMaxPrice })
+  }, [localMinPrice, localMaxPrice]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handlePriceKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') applyPriceFilters()
+  }
 
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: 25 }, (_, i) => currentYear - i)
@@ -73,6 +85,8 @@ export function DealFilters({ makes, models, onFiltersChange }: DealFiltersProps
       sortOrder: 'desc',
     }
     setFilters(cleared)
+    setLocalMinPrice('')
+    setLocalMaxPrice('')
     onFiltersChange?.(cleared)
     router.push('?', { scroll: false })
   }
@@ -154,24 +168,36 @@ export function DealFilters({ makes, models, onFiltersChange }: DealFiltersProps
 
           <div className="space-y-2">
             <Label htmlFor="minPrice">Min Price</Label>
-            <Input
-              id="minPrice"
-              type="number"
-              placeholder="$20,000"
-              value={filters.minPrice}
-              onChange={(e) => updateFilters({ minPrice: e.target.value })}
-            />
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+              <Input
+                id="minPrice"
+                type="text"
+                inputMode="numeric"
+                placeholder="20000"
+                className="pl-7"
+                value={localMinPrice}
+                onChange={(e) => setLocalMinPrice(e.target.value.replace(/[^0-9]/g, ''))}
+                onKeyDown={handlePriceKeyDown}
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="maxPrice">Max Price</Label>
-            <Input
-              id="maxPrice"
-              type="number"
-              placeholder="$50,000"
-              value={filters.maxPrice}
-              onChange={(e) => updateFilters({ maxPrice: e.target.value })}
-            />
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+              <Input
+                id="maxPrice"
+                type="text"
+                inputMode="numeric"
+                placeholder="50000"
+                className="pl-7"
+                value={localMaxPrice}
+                onChange={(e) => setLocalMaxPrice(e.target.value.replace(/[^0-9]/g, ''))}
+                onKeyDown={handlePriceKeyDown}
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -193,6 +219,15 @@ export function DealFilters({ makes, models, onFiltersChange }: DealFiltersProps
             </Select>
           </div>
         </div>
+
+        {(localMinPrice || localMaxPrice) && (
+          localMinPrice !== filters.minPrice || localMaxPrice !== filters.maxPrice
+        ) && (
+          <Button onClick={applyPriceFilters} className="mt-4">
+            <Search className="h-4 w-4 mr-2" />
+            Apply Price Filter
+          </Button>
+        )}
       </CardContent>
     </Card>
   )
