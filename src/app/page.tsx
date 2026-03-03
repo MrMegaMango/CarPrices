@@ -72,7 +72,7 @@ export default async function Home() {
             <span className="text-blue-600 whitespace-nowrap"> Real Buyers</span>
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Discover what people actually paid for their cars. Compare MSRP, selling prices, 
+            Discover what people actually paid for their new cars. Compare MSRP, selling prices, 
             and out-the-door costs to make informed decisions on your next vehicle.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
