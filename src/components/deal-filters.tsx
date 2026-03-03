@@ -174,7 +174,7 @@ export function DealFilters({ makes, models, onFiltersChange }: DealFiltersProps
                 id="minPrice"
                 type="text"
                 inputMode="numeric"
-                placeholder="20000"
+                placeholder="Min"
                 className="pl-7"
                 value={localMinPrice}
                 onChange={(e) => setLocalMinPrice(e.target.value.replace(/[^0-9]/g, ''))}
@@ -191,7 +191,7 @@ export function DealFilters({ makes, models, onFiltersChange }: DealFiltersProps
                 id="maxPrice"
                 type="text"
                 inputMode="numeric"
-                placeholder="50000"
+                placeholder="Max"
                 className="pl-7"
                 value={localMaxPrice}
                 onChange={(e) => setLocalMaxPrice(e.target.value.replace(/[^0-9]/g, ''))}
