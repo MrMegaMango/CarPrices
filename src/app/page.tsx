@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Navigation } from '@/components/navigation'
-import { Car, TrendingDown, Users, Search } from 'lucide-react'
+import { Car, TrendingDown, Users, Search, ArrowRight, PlusCircle } from 'lucide-react'
 import { sql } from '@/lib/db'
 
 async function getStatistics() {
@@ -76,11 +76,18 @@ export default async function Home() {
             and out-the-door costs to make informed decisions on your next vehicle.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" className="text-lg px-8 font-semibold shadow-md hover:shadow-lg transition-shadow focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
-              <Link href="/deals">Browse Reports</Link>
+            <Button asChild size="lg" className="h-14 text-lg px-10 font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
+              <Link href="/deals">
+                <Search className="size-5" />
+                Browse Reports
+                <ArrowRight className="size-5" />
+              </Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="text-lg px-8 font-semibold border-2 border-blue-600 text-blue-700 hover:bg-blue-50 shadow-md hover:shadow-lg transition-shadow focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
-              <Link href="/deals/new">Share Your Report</Link>
+            <Button asChild size="lg" className="h-14 text-lg px-10 font-semibold bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-200 hover:border-gray-300 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none">
+              <Link href="/deals/new">
+                <PlusCircle className="size-5" />
+                Share Your Report
+              </Link>
             </Button>
           </div>
         </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Navigation } from '@/components/navigation'
 import { DealFilters } from '@/components/deal-filters'
 import { DealCard } from '@/components/deal-card'
@@ -18,6 +18,8 @@ interface DealsResponse {
   }
 }
 
+const LIMIT = 20
+
 export default function DealsPage() {
   const [deals, setDeals] = useState<CarDealWithRelations[]>([])
   const [makes, setMakes] = useState<CarMake[]>([])
@@ -26,65 +28,37 @@ export default function DealsPage() {
   const [loadingMore, setLoadingMore] = useState(false)
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 20,
+    limit: LIMIT,
     total: 0,
     pages: 0,
   })
-  const [filters, setFilters] = useState({})
+  const [filters, setFilters] = useState<Record<string, string>>({})
+  const filtersRef = useRef(filters)
+  filtersRef.current = filters
 
-  const fetchMakes = async () => {
+  const fetchDeals = useCallback(async (page: number, currentFilters: Record<string, string>, append: boolean) => {
     try {
-      const response = await fetch('/api/makes')
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      const data = await response.json()
-      setMakes(Array.isArray(data) ? data : [])
-    } catch (error) {
-      console.error('Error fetching makes:', error)
-      setMakes([])
-    }
-  }
-
-  const fetchModels = async () => {
-    try {
-      const response = await fetch('/api/models')
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      const data = await response.json()
-      setModels(Array.isArray(data) ? data : [])
-    } catch (error) {
-      console.error('Error fetching models:', error)
-      setModels([])
-    }
-  }
-
-  const fetchDeals = useCallback(async (reset = false, pageOverride?: number) => {
-    try {
-      if (reset) {
-        setLoading(true)
-        setPagination(prev => ({ ...prev, page: 1 }))
-      } else {
+      if (append) {
         setLoadingMore(true)
+      } else {
+        setLoading(true)
       }
 
-      const currentPage = pageOverride ?? (reset ? 1 : pagination.page)
       const params = new URLSearchParams({
-        page: currentPage.toString(),
-        limit: pagination.limit.toString(),
-        ...filters,
+        page: page.toString(),
+        limit: LIMIT.toString(),
+        ...currentFilters,
       })
 
       const response = await fetch(`/api/deals?${params}`)
       const data: DealsResponse = await response.json()
 
-      if (reset) {
-        setDeals(data.deals)
-      } else {
+      if (append) {
         setDeals(prev => [...prev, ...data.deals])
+      } else {
+        setDeals(data.deals)
       }
-      
+
       setPagination(data.pagination)
     } catch (error) {
       console.error('Error fetching deals:', error)
@@ -92,25 +66,45 @@ export default function DealsPage() {
       setLoading(false)
       setLoadingMore(false)
     }
-  }, [pagination.page, pagination.limit, filters])
+  }, [])
 
   useEffect(() => {
+    const fetchMakes = async () => {
+      try {
+        const response = await fetch('/api/makes')
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+        const data = await response.json()
+        setMakes(Array.isArray(data) ? data : [])
+      } catch (error) {
+        console.error('Error fetching makes:', error)
+        setMakes([])
+      }
+    }
+    const fetchModels = async () => {
+      try {
+        const response = await fetch('/api/models')
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+        const data = await response.json()
+        setModels(Array.isArray(data) ? data : [])
+      } catch (error) {
+        console.error('Error fetching models:', error)
+        setModels([])
+      }
+    }
     fetchMakes()
     fetchModels()
-    fetchDeals()
+    fetchDeals(1, {}, false)
   }, [fetchDeals])
 
   useEffect(() => {
     if (Object.keys(filters).length > 0) {
-      fetchDeals(true)
+      fetchDeals(1, filters, false)
     }
   }, [filters, fetchDeals])
 
   const loadMore = () => {
     if (pagination.page < pagination.pages) {
-      const nextPage = pagination.page + 1
-      setPagination(prev => ({ ...prev, page: nextPage }))
-      fetchDeals(false, nextPage)
+      fetchDeals(pagination.page + 1, filtersRef.current, true)
     }
   }
 
