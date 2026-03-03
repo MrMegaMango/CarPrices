@@ -69,7 +69,7 @@ export default async function Home() {
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
             Real Car Price Reports from
-            <span className="text-blue-600"> Real Buyers</span>
+            <span className="text-blue-600 whitespace-nowrap"> Real Buyers</span>
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Discover what people actually paid for their cars. Compare MSRP, selling prices, 
