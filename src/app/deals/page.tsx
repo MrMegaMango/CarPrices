@@ -24,6 +24,7 @@ export default function DealsPage() {
   const [deals, setDeals] = useState<CarDealWithRelations[]>([])
   const [makes, setMakes] = useState<CarMake[]>([])
   const [models, setModels] = useState<CarModel[]>([])
+  const [locations, setLocations] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const [pagination, setPagination] = useState({
@@ -91,8 +92,20 @@ export default function DealsPage() {
         setModels([])
       }
     }
+    const fetchLocations = async () => {
+      try {
+        const response = await fetch('/api/locations')
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+        const data = await response.json()
+        setLocations(Array.isArray(data) ? data : [])
+      } catch (error) {
+        console.error('Error fetching locations:', error)
+        setLocations([])
+      }
+    }
     fetchMakes()
     fetchModels()
+    fetchLocations()
     fetchDeals(1, {}, false)
   }, [fetchDeals])
 
@@ -140,9 +153,10 @@ export default function DealsPage() {
         </div>
 
         <div className="space-y-6">
-          <DealFilters 
-            makes={makes} 
-            models={models} 
+          <DealFilters
+            makes={makes}
+            models={models}
+            locations={locations}
             onFiltersChange={handleFiltersChange}
           />
 

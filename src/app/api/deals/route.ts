@@ -42,6 +42,7 @@ export async function GET(request: NextRequest) {
     const year = searchParams.get('year')
     const minPrice = searchParams.get('minPrice')
     const maxPrice = searchParams.get('maxPrice')
+    const location = searchParams.get('location')
     const sortBy = searchParams.get('sortBy') || 'date'
     const sortOrder = searchParams.get('sortOrder') || 'desc'
     const page = parseInt(searchParams.get('page') || '1')
@@ -95,6 +96,10 @@ export async function GET(request: NextRequest) {
       const maxCents = parseInt(maxPrice) * 100
       params.push(maxCents)
       conditions.push(`d."sellingPrice" <= $${params.length}`)
+    }
+    if (location) {
+      params.push(location)
+      conditions.push(`d."dealerLocation" = $${params.length}`)
     }
 
     const orderByColumn = sortBy === 'price' ? 'd."sellingPrice"' : 'd."createdAt"'

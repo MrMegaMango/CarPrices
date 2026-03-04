@@ -19,10 +19,11 @@ import { CarMake, CarModel } from '@/types'
 interface DealFiltersProps {
   makes: CarMake[]
   models: CarModel[]
+  locations?: string[]
   onFiltersChange?: (filters: Record<string, string>) => void
 }
 
-export function DealFilters({ makes, models, onFiltersChange }: DealFiltersProps) {
+export function DealFilters({ makes, models, locations = [], onFiltersChange }: DealFiltersProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   
@@ -30,6 +31,7 @@ export function DealFilters({ makes, models, onFiltersChange }: DealFiltersProps
     makeId: searchParams.get('makeId') || '',
     modelId: searchParams.get('modelId') || '',
     year: searchParams.get('year') || '',
+    location: searchParams.get('location') || '',
     minPrice: searchParams.get('minPrice') || '',
     maxPrice: searchParams.get('maxPrice') || '',
     sortBy: searchParams.get('sortBy') || 'date',
@@ -79,6 +81,7 @@ export function DealFilters({ makes, models, onFiltersChange }: DealFiltersProps
       makeId: '',
       modelId: '',
       year: '',
+      location: '',
       minPrice: '',
       maxPrice: '',
       sortBy: 'date',
@@ -165,6 +168,25 @@ export function DealFilters({ makes, models, onFiltersChange }: DealFiltersProps
               </SelectContent>
             </Select>
           </div>
+
+          {locations.length > 0 && (
+            <div className="space-y-2">
+              <Label htmlFor="location">Location</Label>
+              <Select value={filters.location} onValueChange={(value) => updateFilters({ location: value === '__all__' ? '' : value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All locations" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__all__">All Locations</SelectItem>
+                  {locations.map((loc) => (
+                    <SelectItem key={loc} value={loc}>
+                      {loc}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="minPrice">Min Price</Label>
