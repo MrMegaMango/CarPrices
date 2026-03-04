@@ -171,13 +171,13 @@ export function DealFilters({ makes, models, locations = [], onFiltersChange }: 
 
           {locations.length > 0 && (
             <div className="space-y-2">
-              <Label htmlFor="location">Location</Label>
+              <Label htmlFor="location">State</Label>
               <Select value={filters.location} onValueChange={(value) => updateFilters({ location: value === '__all__' ? '' : value })}>
                 <SelectTrigger>
-                  <SelectValue placeholder="All locations" />
+                  <SelectValue placeholder="All states" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="__all__">All Locations</SelectItem>
+                  <SelectItem value="__all__">All States</SelectItem>
                   {locations.map((loc) => (
                     <SelectItem key={loc} value={loc}>
                       {loc}

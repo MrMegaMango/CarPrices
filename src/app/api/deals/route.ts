@@ -6,6 +6,7 @@ import { ensureCarDealsColorColumns, ensureCarDealsGuestColumns } from '@/lib/db
 import { authOptions } from '@/lib/auth'
 import { z } from 'zod'
 import { randomBytes, createHash } from 'crypto'
+import { extractState } from '@/lib/states'
 
 const dealSchema = z.object({
   makeId: z.string(),
@@ -98,8 +99,23 @@ export async function GET(request: NextRequest) {
       conditions.push(`d."sellingPrice" <= $${params.length}`)
     }
     if (location) {
-      params.push(location)
-      conditions.push(`d."dealerLocation" = $${params.length}`)
+      // Location filter is a state abbreviation — find all raw dealerLocation values that map to it
+      const allLocs = await sql`
+        select distinct "dealerLocation"
+        from car_deals
+        where "isPublic" = true and "dealerLocation" is not null
+      ` as Array<{ dealerLocation: string }>
+      const matching = allLocs
+        .filter(r => extractState(r.dealerLocation) === location)
+        .map(r => r.dealerLocation)
+      if (matching.length > 0) {
+        const placeholders = matching.map((_, i) => `$${params.length + i + 1}`).join(', ')
+        params.push(...matching)
+        conditions.push(`d."dealerLocation" in (${placeholders})`)
+      } else {
+        // No matching locations — return empty
+        conditions.push('false')
+      }
     }
 
     const orderByColumn = sortBy === 'price' ? 'd."sellingPrice"' : 'd."createdAt"'

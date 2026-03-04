@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { sql } from '@/lib/db'
+import { extractState } from '@/lib/states'
 
 export async function GET() {
   try {
@@ -7,10 +8,15 @@ export async function GET() {
       select distinct "dealerLocation"
       from car_deals
       where "isPublic" = true and "dealerLocation" is not null and "dealerLocation" != ''
-      order by "dealerLocation" asc
     ` as Array<{ dealerLocation: string }>
 
-    return NextResponse.json(rows.map(r => r.dealerLocation))
+    const states = new Set<string>()
+    for (const row of rows) {
+      const state = extractState(row.dealerLocation)
+      if (state) states.add(state)
+    }
+
+    return NextResponse.json([...states].sort())
   } catch (error) {
     console.error('Error fetching locations:', error)
     return NextResponse.json(
