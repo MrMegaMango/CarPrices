@@ -83,9 +83,19 @@ export function Navigation() {
               <Button variant="ghost" size="sm" onClick={() => signIn()}>
                 Sign In
               </Button>
-              <Button size="sm" onClick={() => signIn()}>
-                Get Started
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="sm">Get Started</Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link href="/deals/new">Continue as Guest</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => signIn()}>
+                    Sign In
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           )}
         </div>
