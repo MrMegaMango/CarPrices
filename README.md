@@ -57,6 +57,9 @@ GOOGLE_CLIENT_ID="your-google-client-id"
 GOOGLE_CLIENT_SECRET="your-google-client-secret"
 GITHUB_CLIENT_ID="your-github-client-id"
 GITHUB_CLIENT_SECRET="your-github-client-secret"
+GMAIL_USER="your-gmail-address@gmail.com"
+GMAIL_APP_PASSWORD="your-16-char-gmail-app-password"
+FEEDBACK_EMAIL_FROM="CarDeals <your-gmail-address@gmail.com>"
 ```
 
 4. Set up the database:

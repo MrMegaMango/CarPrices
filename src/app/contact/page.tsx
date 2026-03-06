@@ -21,6 +21,7 @@ export default function ContactPage() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
+  const [emailSent, setEmailSent] = useState(true)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,9 +33,16 @@ export default function ContactPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       })
+      const payload = await res.json().catch(() => ({} as Record<string, unknown>))
 
-      if (!res.ok) {
+      if (!res.ok || payload.success !== true) {
         throw new Error('Failed to submit')
+      }
+
+      const wasConfirmationEmailSent = payload.emailSent === true
+      setEmailSent(wasConfirmationEmailSent)
+      if (!wasConfirmationEmailSent) {
+        toast('Feedback received, but confirmation email is unavailable right now.')
       }
 
       setShowConfirmation(true)
@@ -248,8 +256,9 @@ export default function ContactPage() {
             </div>
             <DialogTitle className="text-center text-2xl">Message Sent!</DialogTitle>
             <DialogDescription className="text-center text-base mt-3">
-              Thanks for your feedback. We&apos;ve sent a confirmation to your email
-              and will get back to you within 24 hours.
+              {emailSent
+                ? 'Thanks for your feedback. We\'ve sent a confirmation to your email and will get back to you within 24 hours.'
+                : 'Thanks for your feedback. We received your message, but confirmation email is not set up right now.'}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="sm:justify-center mt-6">
