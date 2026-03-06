@@ -21,4 +21,17 @@ export async function ensureCarDealsGuestColumns(): Promise<void> {
   `
 }
 
+export async function ensureFeedbackTable(): Promise<void> {
+  await sql`
+    create table if not exists feedback (
+      id serial primary key,
+      name text not null,
+      email text not null,
+      subject text not null,
+      message text not null,
+      created_at timestamp with time zone default now()
+    );
+  `
+}
+
 

@@ -24,11 +24,17 @@ export default function ContactPage() {
     e.preventDefault()
     setIsSubmitting(true)
 
-    // Simulate form submission
     try {
-      // In a real app, you'd send this to your API
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
+      const res = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+
+      if (!res.ok) {
+        throw new Error('Failed to submit')
+      }
+
       toast.success('Message sent successfully! We\'ll get back to you soon.')
       setFormData({ name: '', email: '', subject: '', message: '' })
     } catch {
