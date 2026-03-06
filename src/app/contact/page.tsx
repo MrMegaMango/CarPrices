@@ -239,19 +239,21 @@ export default function ContactPage() {
       </section>
 
       <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md p-8">
           <DialogHeader>
-            <div className="flex justify-center mb-4">
-              <CheckCircle2 className="h-12 w-12 text-green-500" />
+            <div className="flex justify-center mb-6">
+              <div className="rounded-full bg-green-100 p-4">
+                <CheckCircle2 className="h-16 w-16 text-green-600" />
+              </div>
             </div>
-            <DialogTitle className="text-center">Message Sent!</DialogTitle>
-            <DialogDescription className="text-center">
+            <DialogTitle className="text-center text-2xl">Message Sent!</DialogTitle>
+            <DialogDescription className="text-center text-base mt-3">
               Thanks for your feedback. We&apos;ve sent a confirmation to your email
               and will get back to you within 24 hours.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="sm:justify-center">
-            <Button onClick={() => setShowConfirmation(false)}>
+          <DialogFooter className="sm:justify-center mt-6">
+            <Button size="lg" className="px-8" onClick={() => setShowConfirmation(false)}>
               Got it
             </Button>
           </DialogFooter>
