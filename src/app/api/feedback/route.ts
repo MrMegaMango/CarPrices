@@ -57,8 +57,9 @@ export async function POST(request: NextRequest) {
     `
 
     // Send confirmation email (non-blocking — don't fail the request if email fails)
-    sendConfirmationEmail(data.email, data.name, data.subject).catch((err) =>
-      console.error('Failed to send confirmation email:', err)
+    sendConfirmationEmail(data.email, data.name, data.subject)
+      .then(() => console.log('Confirmation email sent to', data.email))
+      .catch((err) => console.error('Failed to send confirmation email:', err)
     )
 
     return NextResponse.json({ success: true })
