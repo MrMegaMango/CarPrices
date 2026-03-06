@@ -60,6 +60,8 @@ GITHUB_CLIENT_SECRET="your-github-client-secret"
 GMAIL_USER="your-gmail-address@gmail.com"
 GMAIL_APP_PASSWORD="your-16-char-gmail-app-password"
 FEEDBACK_EMAIL_FROM="CarDeals <your-gmail-address@gmail.com>"
+FEEDBACK_ADMIN_EMAIL="admin@example.com"
+FEEDBACK_ADMIN_EMAILS="admin1@example.com,admin2@example.com"
 ```
 
 4. Set up the database:

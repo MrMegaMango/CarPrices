@@ -10,6 +10,7 @@ const feedbackSchema = z.object({
   subject: z.string().min(1).max(500),
   message: z.string().min(1).max(5000),
 })
+type FeedbackPayload = z.infer<typeof feedbackSchema>
 
 function escapeHtml(value: string): string {
   return value
@@ -29,14 +30,30 @@ function maskEmail(email: string): string {
 
 type EmailSendResult =
   | { sent: true }
-  | { sent: false; reason: 'missing_config' | 'smtp_error' }
+  | { sent: false; reason: 'missing_config' | 'missing_admin_recipient' | 'smtp_error' }
+
+function getMailConfig() {
+  const smtpUser = process.env.GMAIL_USER?.trim()
+  const smtpPass = process.env.GMAIL_APP_PASSWORD?.trim()
+  const fromAddress = process.env.FEEDBACK_EMAIL_FROM?.trim() || (smtpUser ? `CarDeals <${smtpUser}>` : '')
+
+  if (!smtpUser || !smtpPass || !fromAddress) return null
+
+  return { smtpUser, smtpPass, fromAddress }
+}
+
+function getAdminRecipients() {
+  const raw = process.env.FEEDBACK_ADMIN_EMAILS || process.env.FEEDBACK_ADMIN_EMAIL || ''
+  return raw
+    .split(/[,\s;]+/)
+    .map((value) => value.trim())
+    .filter(Boolean)
+}
 
 async function sendConfirmationEmail(to: string, name: string, subject: string) {
-  const smtpUser = process.env.GMAIL_USER
-  const smtpPass = process.env.GMAIL_APP_PASSWORD
-  const fromAddress = process.env.FEEDBACK_EMAIL_FROM || (smtpUser ? `CarDeals <${smtpUser}>` : '')
+  const config = getMailConfig()
 
-  if (!smtpUser || !smtpPass || !fromAddress) {
+  if (!config) {
     return { sent: false, reason: 'missing_config' } satisfies EmailSendResult
   }
 
@@ -46,13 +63,13 @@ async function sendConfirmationEmail(to: string, name: string, subject: string) 
       port: 587,
       secure: false,
       auth: {
-        user: smtpUser,
-        pass: smtpPass,
+        user: config.smtpUser,
+        pass: config.smtpPass,
       },
     })
 
     await transporter.sendMail({
-      from: fromAddress,
+      from: config.fromAddress,
       to,
       subject: `We received your feedback: "${subject}"`,
       html: `
@@ -70,6 +87,53 @@ async function sendConfirmationEmail(to: string, name: string, subject: string) 
     return { sent: true } satisfies EmailSendResult
   } catch (error) {
     console.error('Failed to send confirmation email:', error)
+    return { sent: false, reason: 'smtp_error' } satisfies EmailSendResult
+  }
+}
+
+async function sendAdminNotificationEmail(payload: FeedbackPayload) {
+  const config = getMailConfig()
+  if (!config) {
+    return { sent: false, reason: 'missing_config' } satisfies EmailSendResult
+  }
+
+  const recipients = getAdminRecipients()
+  if (recipients.length === 0) {
+    return { sent: false, reason: 'missing_admin_recipient' } satisfies EmailSendResult
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: config.smtpUser,
+        pass: config.smtpPass,
+      },
+    })
+
+    await transporter.sendMail({
+      from: config.fromAddress,
+      to: recipients.join(', '),
+      replyTo: payload.email,
+      subject: `New feedback received: ${payload.subject}`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 700px; margin: 0 auto;">
+          <h2 style="color: #111827; margin-bottom: 12px;">New feedback submission</h2>
+          <p style="margin: 0 0 8px;"><strong>Name:</strong> ${escapeHtml(payload.name)}</p>
+          <p style="margin: 0 0 8px;"><strong>Email:</strong> ${escapeHtml(payload.email)}</p>
+          <p style="margin: 0 0 8px;"><strong>Subject:</strong> ${escapeHtml(payload.subject)}</p>
+          <p style="margin: 0 0 6px;"><strong>Message:</strong></p>
+          <pre style="white-space: pre-wrap; margin: 0; background: #f9fafb; padding: 12px; border-radius: 6px; border: 1px solid #e5e7eb;">${escapeHtml(payload.message)}</pre>
+        </div>
+      `,
+      text: `New feedback submission\n\nName: ${payload.name}\nEmail: ${payload.email}\nSubject: ${payload.subject}\n\nMessage:\n${payload.message}`,
+    })
+
+    return { sent: true } satisfies EmailSendResult
+  } catch (error) {
+    console.error('Failed to send admin notification email:', error)
     return { sent: false, reason: 'smtp_error' } satisfies EmailSendResult
   }
 }
@@ -99,10 +163,23 @@ export async function POST(request: NextRequest) {
       console.warn(`[feedback:${requestId}] Confirmation email failed due to SMTP error`)
     }
 
+    const adminEmailResult = await sendAdminNotificationEmail(data)
+    if (adminEmailResult.sent) {
+      console.log(`[feedback:${requestId}] Admin notification email sent`)
+    } else if (adminEmailResult.reason === 'missing_config') {
+      console.warn(`[feedback:${requestId}] Admin notification skipped (missing GMAIL_USER/GMAIL_APP_PASSWORD/FEEDBACK_EMAIL_FROM config)`)
+    } else if (adminEmailResult.reason === 'missing_admin_recipient') {
+      console.warn(`[feedback:${requestId}] Admin notification skipped (missing FEEDBACK_ADMIN_EMAIL or FEEDBACK_ADMIN_EMAILS config)`)
+    } else {
+      console.warn(`[feedback:${requestId}] Admin notification failed due to SMTP error`)
+    }
+
     return NextResponse.json({
       success: true,
       emailSent: emailResult.sent,
       emailReason: emailResult.sent ? null : emailResult.reason,
+      adminNotified: adminEmailResult.sent,
+      adminNotifyReason: adminEmailResult.sent ? null : adminEmailResult.reason,
     })
   } catch (error) {
     if (error instanceof z.ZodError) {
