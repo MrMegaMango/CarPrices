@@ -12,23 +12,23 @@ const feedbackSchema = z.object({
 })
 
 async function sendConfirmationEmail(to: string, name: string, subject: string) {
-  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    console.warn('SMTP not configured, skipping confirmation email')
+  if (!process.env.GMAIL_APP_PASSWORD) {
+    console.warn('GMAIL_APP_PASSWORD not configured, skipping confirmation email')
     return
   }
 
   const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: process.env.SMTP_SECURE === 'true',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      user: 'amangousa@gmail.com',
+      pass: process.env.GMAIL_APP_PASSWORD,
     },
   })
 
   await transporter.sendMail({
-    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+    from: 'CarDeals <amangousa@gmail.com>',
     to,
     subject: `We received your feedback: "${subject}"`,
     html: `
