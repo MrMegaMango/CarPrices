@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Navigation } from '@/components/navigation'
-import { Car, Mail, MessageSquare, Send, MapPin, Clock } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Car, Mail, MessageSquare, Send, MapPin, Clock, CheckCircle2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 export default function ContactPage() {
@@ -19,6 +20,7 @@ export default function ContactPage() {
     message: ''
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showConfirmation, setShowConfirmation] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,7 +37,7 @@ export default function ContactPage() {
         throw new Error('Failed to submit')
       }
 
-      toast.success('Message sent successfully! We\'ll get back to you soon.')
+      setShowConfirmation(true)
       setFormData({ name: '', email: '', subject: '', message: '' })
     } catch {
       toast.error('Something went wrong. Please try again.')
@@ -235,6 +237,26 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
+
+      <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>
+        <DialogContent>
+          <DialogHeader>
+            <div className="flex justify-center mb-4">
+              <CheckCircle2 className="h-12 w-12 text-green-500" />
+            </div>
+            <DialogTitle className="text-center">Message Sent!</DialogTitle>
+            <DialogDescription className="text-center">
+              Thanks for your feedback. We&apos;ve sent a confirmation to your email
+              and will get back to you within 24 hours.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-center">
+            <Button onClick={() => setShowConfirmation(false)}>
+              Got it
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12 mt-16">
