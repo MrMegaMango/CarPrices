@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Navigation } from '@/components/navigation'
 import { Car, TrendingDown, Users, Search, ArrowRight, PlusCircle } from 'lucide-react'
+import { TipButton } from '@/components/tip-button'
 import { sql } from '@/lib/db'
 
 async function getStatistics() {
@@ -195,6 +196,7 @@ export default async function Home() {
               <Link href="/privacy" className="hover:text-white">Privacy</Link>
               <Link href="/terms" className="hover:text-white">Terms</Link>
               <Link href="/contact" className="hover:text-white">Contact</Link>
+              <TipButton />
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
