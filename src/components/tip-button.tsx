@@ -13,7 +13,13 @@ export function TipButton() {
       const data = await res.json()
       if (data.url) {
         window.location.href = data.url
+      } else {
+        console.error('Tip API error:', data.error)
+        alert(data.error ?? 'Something went wrong.')
       }
+    } catch (err) {
+      console.error('Tip fetch error:', err)
+      alert('Could not reach the server.')
     } finally {
       setPending(false)
     }
