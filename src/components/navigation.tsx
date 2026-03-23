@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useSession, signIn, signOut } from 'next-auth/react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -10,10 +11,24 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Car, Plus, User, LogOut, BarChart3 } from 'lucide-react'
+import { Car, Plus, User, LogOut, BarChart3, Heart } from 'lucide-react'
 
 export function Navigation() {
   const { data: session, status } = useSession()
+  const [tipPending, setTipPending] = useState(false)
+
+  async function handleTip() {
+    setTipPending(true)
+    try {
+      const res = await fetch('/api/stripe/tip', { method: 'POST' })
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+      }
+    } finally {
+      setTipPending(false)
+    }
+  }
 
   return (
     <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
@@ -37,6 +52,15 @@ export function Navigation() {
             <BarChart3 className="h-4 w-4" />
             <span>Statistics</span>
           </Link>
+
+          <button
+            onClick={handleTip}
+            disabled={tipPending}
+            className="text-sm font-medium transition-colors hover:text-pink-600 flex items-center space-x-1 text-gray-600 disabled:opacity-50"
+          >
+            <Heart className="h-4 w-4" />
+            <span>{tipPending ? 'Opening…' : 'Tip jar'}</span>
+          </button>
 
           {status === 'loading' ? (
             <div className="h-9 w-20 bg-gray-200 animate-pulse rounded" />
